@@ -1,0 +1,5 @@
+# Docs
+
+Tasks manager application.
+
+
