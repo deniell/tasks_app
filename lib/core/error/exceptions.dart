@@ -6,6 +6,9 @@ class ServerException implements Exception {
 // throw for 422
 class ValidationException implements Exception {
   final String message = "Validation failed.";
+  final String cause;
+
+  ValidationException({this.cause});
 }
 
 // throw for 403

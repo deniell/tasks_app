@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 ///
 /// User entity, just to keep auth token
 ///
@@ -7,6 +9,8 @@ class User {
   // The token will expire in 24 hours
   final String token;
 
-  User({this.token});
+  User({
+    @required this.token
+  });
 
 }
