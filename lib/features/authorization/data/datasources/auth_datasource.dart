@@ -7,7 +7,7 @@ import 'package:tasks_app/core/error/exceptions.dart';
 import 'package:tasks_app/features/authorization/data/models/user_model.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 
-abstract class RemoteDataSource {
+abstract class AuthDataSource {
 
   ///
   /// Add a new user
@@ -22,10 +22,10 @@ abstract class RemoteDataSource {
   Future<User> authorize(String email, String password);
 }
 
-class RemoteDataSourceImpl implements RemoteDataSource {
+class AuthDataSourceImpl implements AuthDataSource {
   final http.Client client;
 
-  RemoteDataSourceImpl({@required this.client});
+  AuthDataSourceImpl({@required this.client});
 
   @override
   Future<User> addNewUser(String email, String password) async {
