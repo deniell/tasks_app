@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dartz/dartz_unsafe.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
@@ -45,6 +46,9 @@ class AuthDataSourceImpl implements AuthDataSource {
       body: json.encode(data)
     );
 
+    print(response.statusCode);
+    print(response.body);
+
     if (response.statusCode == 201) {
 
       return UserModel.fromJson(json.decode(response.body));
@@ -54,7 +58,12 @@ class AuthDataSourceImpl implements AuthDataSource {
       String cause;
 
       try {
-        cause = json.decode(response.body)['fields']['email'][0];
+        final Map responseBody = json.decode(response.body);
+        if (responseBody != null && responseBody.containsKey('fields'))
+        {
+          final Map fields = responseBody['fields'];
+          fields.forEach((k,v) => cause += v);
+        }
       } catch(e) {
         // ignore
       }
@@ -91,6 +100,9 @@ class AuthDataSourceImpl implements AuthDataSource {
         body: json.encode(data)
     );
 
+    print(response.statusCode);
+    print(response.body);
+
     if (response.statusCode == 200) {
 
       return UserModel.fromJson(json.decode(response.body));
@@ -104,7 +116,12 @@ class AuthDataSourceImpl implements AuthDataSource {
       String cause;
 
       try {
-        cause = json.decode(response.body)['fields']['email'][0];
+        final Map responseBody = json.decode(response.body);
+        if (responseBody != null && responseBody.containsKey('fields'))
+        {
+          final Map fields = responseBody['fields'];
+          fields.forEach((k,v) => cause += v);
+        }
       } catch(e) {
         // ignore
       }

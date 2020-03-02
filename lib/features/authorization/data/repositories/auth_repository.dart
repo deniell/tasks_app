@@ -46,7 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> authorize(String email, String password) async {
     if (await networkInfo.isConnected) {
       try {
-        User user = await authDataSource.addNewUser(email, password);
+        User user = await authDataSource.authorize(email, password);
         return Right(user);
       } on ServerException {
         return Left(ServerFailure());
