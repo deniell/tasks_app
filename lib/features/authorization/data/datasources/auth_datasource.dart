@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dartz/dartz_unsafe.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
@@ -53,26 +52,17 @@ class AuthDataSourceImpl implements AuthDataSource {
 
       return UserModel.fromJson(json.decode(response.body));
 
+    } else if (response.statusCode == 403) {
+
+      throw UnauthorizedException(respBody: response.body);
+
     } else if (response.statusCode == 422) {
 
-      String cause;
-
-      try {
-        final Map responseBody = json.decode(response.body);
-        if (responseBody != null && responseBody.containsKey('fields'))
-        {
-          final Map fields = responseBody['fields'];
-          fields.forEach((k,v) => cause += v);
-        }
-      } catch(e) {
-        // ignore
-      }
-
-      throw ValidationException(cause: cause);
+      throw ValidationException(respBody: response.body);
 
     } else if (response.statusCode == 500) {
 
-      throw ServerException();
+      throw ServerException(respBody: response.body);
 
     }
     else {
@@ -109,28 +99,15 @@ class AuthDataSourceImpl implements AuthDataSource {
 
     } else if (response.statusCode == 403) {
 
-      throw UnauthorizedException();
+      throw UnauthorizedException(respBody: response.body);
 
     } else if (response.statusCode == 422) {
 
-      String cause;
-
-      try {
-        final Map responseBody = json.decode(response.body);
-        if (responseBody != null && responseBody.containsKey('fields'))
-        {
-          final Map fields = responseBody['fields'];
-          fields.forEach((k,v) => cause += v);
-        }
-      } catch(e) {
-        // ignore
-      }
-
-      throw ValidationException(cause: cause);
+      throw ValidationException(respBody: response.body);
 
     } else if (response.statusCode == 500) {
 
-      throw ServerException();
+      throw ServerException(respBody: response.body);
 
     }
     else {
@@ -140,5 +117,4 @@ class AuthDataSourceImpl implements AuthDataSource {
     }
 
   }
-
 }

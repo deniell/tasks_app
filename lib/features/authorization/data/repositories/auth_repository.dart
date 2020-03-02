@@ -27,14 +27,15 @@ class AuthRepositoryImpl implements AuthRepository {
         User user = await authDataSource.addNewUser(email, password);
         return Right(user);
       } on ServerException {
-        return Left(ServerFailure());
+        return Left(ServerFailure(cause: ServerException.cause));
       } on ValidationException {
-        return Left(ValidationFailure());
+        return Left(ValidationFailure(cause: ValidationException.cause));
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return Left(UnauthorizedFailure(cause: UnauthorizedException.cause));
       } on UnexpectedException {
         return Left(UnexpectedFailure());
       } catch (e) {
+        print(e);
         return Left(UnknownFailure());
       }
     } else {
@@ -49,14 +50,15 @@ class AuthRepositoryImpl implements AuthRepository {
         User user = await authDataSource.authorize(email, password);
         return Right(user);
       } on ServerException {
-        return Left(ServerFailure());
+        return Left(ServerFailure(cause: ServerException.cause));
       } on ValidationException {
-        return Left(ValidationFailure());
+        return Left(ValidationFailure(cause: ValidationException.cause));
       } on UnauthorizedException {
-        return Left(UnauthorizedFailure());
+        return Left(UnauthorizedFailure(cause: UnauthorizedException.cause));
       } on UnexpectedException {
         return Left(UnexpectedFailure());
       } catch (e) {
+        print(e);
         return Left(UnknownFailure());
       }
     } else {
