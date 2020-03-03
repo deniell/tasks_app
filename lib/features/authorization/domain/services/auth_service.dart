@@ -26,15 +26,30 @@ class AuthService with ChangeNotifier {
 
     result.fold(
         (failure) {
+          _updateUser(user: null);
           print((failure as CacheFailure).message);
         },
         (user) {
-          _user = user;
-          notifyListeners();
+          _updateUser(user: user);
         });
   }
 
   User get user => _user;
+
+  ///
+  /// Update current user entity
+  ///
+  void _updateUser({@required User user}) {
+
+    if (user == null) {
+      _user = User(token: null);
+    } else {
+      _user = user;
+    }
+
+    // notify current user listeners
+    notifyListeners();
+  }
 
   Future<String> addNewUser(String email, String password) async {
 
@@ -45,8 +60,7 @@ class AuthService with ChangeNotifier {
           return _mapFailureToMessage(failure);
         },
             (user) {
-          _user = user;
-          notifyListeners();
+          _updateUser(user: user);
           localeRepository.saveUser2Cache(user);
           return null;
         }
@@ -62,9 +76,8 @@ class AuthService with ChangeNotifier {
           return _mapFailureToMessage(failure);
         },
             (user) {
-          _user = user;
+          _updateUser(user: user);
           localeRepository.saveUser2Cache(user);
-          notifyListeners();
           return null;
         }
     );
@@ -91,9 +104,8 @@ class AuthService with ChangeNotifier {
 
   // sign out
   Future signOut() async {
-    _user = null;
+    _updateUser(user: null);
     await localeRepository.removeUserFromCache();
-    notifyListeners();
   }
 
 }
