@@ -49,3 +49,7 @@ class UnknownFailure extends Failure {
 class NoInternetFailure extends Failure {
   final String message = NO_INTERNET_MESSAGE;
 }
+
+class CacheFailure extends Failure {
+  final String message = CACHE_ERROR_MESSAGE;
+}

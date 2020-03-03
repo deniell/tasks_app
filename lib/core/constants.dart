@@ -16,6 +16,8 @@ const String UNKNOWN_ERROR_MESSAGE = "Something went wrong.";
 
 const String NO_INTERNET_MESSAGE = "No internet connection.";
 
+const String CACHE_ERROR_MESSAGE = "Cache Failure.";
+
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
   filled: true,
