@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/widgets/app_drawer.dart';
 
 class TasksList extends StatelessWidget {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: AppDrawer(),
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
         title: Text(
@@ -21,11 +26,10 @@ class TasksList extends StatelessWidget {
             FontAwesomeIcons.bars,
             color: Colors.grey[700],
           ),
-          onPressed: () => {},
+          onPressed: () => _scaffoldKey.currentState.openDrawer(),
         ),
         actions: <Widget>[
           PopupMenuButton<int>(
-
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 0,
@@ -84,13 +88,6 @@ class TasksList extends StatelessWidget {
               }
             },
           ),
-//          IconButton(
-//            icon: Icon(
-//              FontAwesomeIcons.listUl,
-//              color: Colors.grey[700],
-//            ),
-//            onPressed: () => {},
-//          ),
           IconButton(
             icon: Icon(
               FontAwesomeIcons.sortAmountDown,
@@ -105,7 +102,6 @@ class TasksList extends StatelessWidget {
           child: Text('TaskList'),
         ),
       ),
-      drawer: Drawer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         onPressed: () {},

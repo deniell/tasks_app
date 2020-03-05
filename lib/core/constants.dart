@@ -18,6 +18,8 @@ const String NO_INTERNET_MESSAGE = "No internet connection.";
 
 const String CACHE_ERROR_MESSAGE = "Cache Failure.";
 
+MaterialColor appColor = Colors.grey[600];
+
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
   filled: true,

@@ -25,7 +25,12 @@ class AuthRepositoryImpl implements AuthRepository {
     if (await networkInfo.isConnected) {
       try {
         User user = await authDataSource.addNewUser(email, password);
-        return Right(user);
+        if (user != null)
+        {
+          return Right(user);
+        } else {
+          return Left(UnknownFailure());
+        }
       } on ServerException {
         return Left(ServerFailure(cause: ServerException.cause));
       } on ValidationException {
@@ -48,7 +53,12 @@ class AuthRepositoryImpl implements AuthRepository {
     if (await networkInfo.isConnected) {
       try {
         User user = await authDataSource.authorize(email, password);
-        return Right(user);
+        if (user != null)
+        {
+          return Right(user);
+        } else {
+          return Left(UnknownFailure());
+        }
       } on ServerException {
         return Left(ServerFailure(cause: ServerException.cause));
       } on ValidationException {

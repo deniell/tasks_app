@@ -22,5 +22,5 @@ class Task {
 }
 
 enum Priority {
-  High, Medium, Low
+  High, Normal, Low
 }

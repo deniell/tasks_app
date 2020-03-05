@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
-import 'package:tasks_app/core/error/exceptions.dart';
+import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/models/user_model.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 
@@ -52,22 +52,10 @@ class AuthDataSourceImpl implements AuthDataSource {
 
       return UserModel.fromJson(json.decode(response.body));
 
-    } else if (response.statusCode == 403) {
+    } else {
 
-      throw UnauthorizedException(respBody: response.body);
-
-    } else if (response.statusCode == 422) {
-
-      throw ValidationException(respBody: response.body);
-
-    } else if (response.statusCode == 500) {
-
-      throw ServerException(respBody: response.body);
-
-    }
-    else {
-
-      throw UnexpectedException();
+      checkResponseFailure(response);
+      return null; // unreachable
 
     }
   }
@@ -97,24 +85,11 @@ class AuthDataSourceImpl implements AuthDataSource {
 
       return UserModel.fromJson(json.decode(response.body));
 
-    } else if (response.statusCode == 403) {
+    } else {
 
-      throw UnauthorizedException(respBody: response.body);
-
-    } else if (response.statusCode == 422) {
-
-      throw ValidationException(respBody: response.body);
-
-    } else if (response.statusCode == 500) {
-
-      throw ServerException(respBody: response.body);
+      checkResponseFailure(response);
+      return null; // unreachable
 
     }
-    else {
-
-      throw UnexpectedException();
-
-    }
-
   }
 }
