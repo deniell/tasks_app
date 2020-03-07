@@ -8,6 +8,7 @@ import 'package:tasks_app/features/authorization/data/repositories/auth_reposito
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/local_datasource.dart';
+import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
@@ -33,6 +34,9 @@ Future<void> init() async {
   );
   di.registerLazySingleton<LocalDataSource>(
       () => LocalDataSourceImpl(),
+  );
+  di.registerLazySingleton<RemoteDataSource>(
+      () => RemoteDataSourceImpl(client: di())
   );
 
   // Repository

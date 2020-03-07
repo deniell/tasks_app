@@ -23,6 +23,7 @@ abstract class AuthDataSource {
 }
 
 class AuthDataSourceImpl implements AuthDataSource {
+
   final http.Client client;
 
   AuthDataSourceImpl({@required this.client});

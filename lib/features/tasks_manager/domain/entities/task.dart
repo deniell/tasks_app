@@ -24,3 +24,9 @@ class Task {
 enum Priority {
   High, Normal, Low
 }
+
+extension on Priority {
+  String value() {
+    return this.toString().split('.').last;
+  }
+}
