@@ -11,6 +11,7 @@ import 'package:tasks_app/features/tasks_manager/data/datasources/local_datasour
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 
 final di = GetIt.instance;
 
@@ -49,6 +50,13 @@ Future<void> init() async {
   di.registerLazySingleton<LocalRepository>(
       () => LocalRepositoryImpl(
         localDataSource: di(),
+      )
+  );
+  di.registerLazySingleton<TaskRepository>(
+      () => TaskRepositoryImpl(
+        remoteDataSource: di(),
+        localDataSource: di(),
+        networkInfo: di()
       )
   );
 

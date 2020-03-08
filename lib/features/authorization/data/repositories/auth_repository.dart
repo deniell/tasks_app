@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tasks_app/core/error/exceptions.dart';
 import 'package:tasks_app/core/error/failures.dart';
 import 'package:tasks_app/core/network/network_info.dart';
+import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/datasources/auth_datasource.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 
@@ -25,23 +25,15 @@ class AuthRepositoryImpl implements AuthRepository {
     if (await networkInfo.isConnected) {
       try {
         User user = await authDataSource.addNewUser(email, password);
-        if (user != null)
-        {
+        if (user != null) {
           return Right(user);
         } else {
           return Left(UnknownFailure());
         }
-      } on ServerException {
-        return Left(ServerFailure(cause: ServerException.cause));
-      } on ValidationException {
-        return Left(ValidationFailure(cause: ValidationException.cause));
-      } on UnauthorizedException {
-        return Left(UnauthorizedFailure(cause: UnauthorizedException.cause));
-      } on UnexpectedException {
-        return Left(UnexpectedFailure());
       } catch (e) {
         print(e);
-        return Left(UnknownFailure());
+        Failure failure = evaluateException(e);
+        return Left(failure);
       }
     } else {
       return Left(NoInternetFailure());
@@ -53,23 +45,15 @@ class AuthRepositoryImpl implements AuthRepository {
     if (await networkInfo.isConnected) {
       try {
         User user = await authDataSource.authorize(email, password);
-        if (user != null)
-        {
+        if (user != null) {
           return Right(user);
         } else {
           return Left(UnknownFailure());
         }
-      } on ServerException {
-        return Left(ServerFailure(cause: ServerException.cause));
-      } on ValidationException {
-        return Left(ValidationFailure(cause: ValidationException.cause));
-      } on UnauthorizedException {
-        return Left(UnauthorizedFailure(cause: UnauthorizedException.cause));
-      } on UnexpectedException {
-        return Left(UnexpectedFailure());
       } catch (e) {
         print(e);
-        return Left(UnknownFailure());
+        Failure failure = evaluateException(e);
+        return Left(failure);
       }
     } else {
       return Left(NoInternetFailure());

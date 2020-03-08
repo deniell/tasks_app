@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/util/util.dart';
-import 'package:tasks_app/features/authorization/data/models/user_model.dart';
 import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
 import 'package:http/http.dart' as http;
@@ -41,7 +40,7 @@ abstract class RemoteDataSource {
   /// OK 202
   /// TODO: do not sent description field until it will be added to API
   ///
-  Future<void> updateTask(Task task, String token);
+  Future<bool> updateTask(TaskModel task, String token);
 
   ///
   /// Delete a task
@@ -49,7 +48,7 @@ abstract class RemoteDataSource {
   /// curl -X DELETE "https://testapi.doitserver.in.ua/api/tasks/2552" -H "accept: application/json" -H "Authorization: Bearer ..."
   /// OK 202
   ///
-  Future<void> deleteTask(int taskId, String token);
+  Future<bool> deleteTask(int taskId, String token);
 }
 
 class RemoteDataSourceImpl implements RemoteDataSource {
@@ -92,15 +91,55 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<void> deleteTask(int taskId, String token) {
-    // TODO: implement deleteTask
-    return null;
+  Future<bool> deleteTask(int taskId, String token) async {
+
+    final String url = "$BASE_URL/tasks/$taskId";
+
+    final response = await client.delete(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    print(response.statusCode);
+    print(response.body);
+
+    if (response.statusCode == 202) {
+      return true;
+    } else {
+      checkResponseFailure(response);
+      return false; // unreachable
+    }
   }
 
   @override
-  Future<Task> getTaskDetails(int taskId, String token) {
-    // TODO: implement getTaskDetails
-    return null;
+  Future<Task> getTaskDetails(int taskId, String token) async {
+
+    final String url = "$BASE_URL/tasks/$taskId";
+
+    final response = await client.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+    );
+
+    print(response.statusCode);
+    print(response.body);
+
+    if (response.statusCode == 200) {
+
+      return TaskModel.fromJson(json.decode(response.body)['task']);
+
+    } else {
+
+      checkResponseFailure(response);
+      return null; // unreachable
+
+    }
   }
 
   @override
@@ -142,9 +181,30 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<void> updateTask(Task task, String token) {
-    // TODO: implement updateTask
-    return null;
+  Future<bool> updateTask(TaskModel task, String token) async {
+
+    final String url = "$BASE_URL/tasks/${task.id}";
+
+    var data = task.toJson();
+
+    final response = await client.put(
+        Uri.encodeFull(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: json.encode(data)
+    );
+
+    print(response.statusCode);
+    print(response.body);
+
+    if (response.statusCode == 202) {
+      return true;
+    } else {
+      checkResponseFailure(response);
+      return false;
+    }
   }
 
 }
