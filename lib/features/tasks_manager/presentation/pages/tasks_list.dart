@@ -22,13 +22,14 @@ class TasksList extends StatefulWidget {
 class _TasksListState extends State<TasksList> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  AuthService authServiceProvider;
   SortFilter filter;
-  SortDirection direction;
+  ValueNotifier<SortDirection> sortDirectionNotifier = ValueNotifier<SortDirection>(SortDirection.asc);
 
   @override
   Widget build(BuildContext context) {
 
-    final authServiceProvider = Provider.of<AuthService>(context);
+    authServiceProvider = Provider.of<AuthService>(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -102,34 +103,28 @@ class _TasksListState extends State<TasksList> {
               if (item == 1) {
                 TasksListEvent gEvent = GetTasksList(
                   filter: SortFilter.title,
-                  direction: SortDirection.asc,
+                  direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
                 );
                 dispatchTasksList(gEvent);
               } else if (item == 2) {
                 TasksListEvent gEvent = GetTasksList(
                   filter: SortFilter.priority,
-                  direction: SortDirection.asc,
+                  direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
                 );
                 dispatchTasksList(gEvent);
               } else if (item == 3) {
                 TasksListEvent gEvent = GetTasksList(
                   filter: SortFilter.dueBy,
-                  direction: SortDirection.asc,
+                  direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
                 );
                 dispatchTasksList(gEvent);
               }
             },
           ),
-          IconButton(
-            icon: Icon(
-              FontAwesomeIcons.sortAmountDown,
-              color: Colors.grey[700],
-            ),
-            onPressed: () => {},
-          )
+          sortDirectionBtn()
         ],
       ),
       body: buildBody(context),
@@ -184,5 +179,47 @@ class _TasksListState extends State<TasksList> {
 
   void dispatchTasksList(GetTasksList gEvent) {
     di<TasksListBloc>().add(gEvent);
+  }
+
+  ///
+  /// Task list sort direction button
+  ///
+  Widget sortDirectionBtn()
+  {
+    return ValueListenableBuilder(
+      builder: (BuildContext context, SortDirection value, Widget child)
+      {
+        switch(value) {
+          case SortDirection.asc:
+            return IconButton(
+              icon: Icon(
+                FontAwesomeIcons.sortAmountUp,
+                color: Colors.grey[700],
+              ),
+              onPressed: () {
+                sortDirectionNotifier.value = SortDirection.desc;
+                TasksListEvent gEvent = GetTasksList(
+                    filter: SortFilter.dueBy,
+                    direction: sortDirectionNotifier.value,
+                    token: authServiceProvider.user.token
+                );
+                dispatchTasksList(gEvent);
+              },
+            );
+          case SortDirection.desc:
+            return IconButton(
+              icon: Icon(
+                FontAwesomeIcons.sortAmountDown,
+                color: Colors.grey[700],
+              ),
+              onPressed: () {
+                sortDirectionNotifier.value = SortDirection.asc;
+              },
+            );
+        }
+        return null; //unreachable
+      },
+      valueListenable: sortDirectionNotifier,
+    );
   }
 }
