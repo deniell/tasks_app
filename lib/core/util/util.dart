@@ -76,3 +76,25 @@ Failure evaluateException(dynamic e) {
       return UnknownFailure();
   }
 }
+
+///
+/// Return Failure cause message depends on Failure type
+///
+String mapFailureToMessage(Failure failure) {
+  switch (failure.runtimeType) {
+    case ServerFailure:
+      return (failure as ServerFailure).message;
+    case ValidationFailure:
+      return (failure as ValidationFailure).message;
+    case UnauthorizedFailure:
+      return (failure as UnauthorizedFailure).message;
+    case UnexpectedFailure:
+      return (failure as UnexpectedFailure).message;
+    case UnknownFailure:
+      return (failure as UnknownFailure).message;
+    case NoInternetFailure:
+      return (failure as NoInternetFailure).message;
+    default:
+      return 'Unexpected error';
+  }
+}

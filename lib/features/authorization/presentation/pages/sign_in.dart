@@ -2,8 +2,8 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tasks_app/core/constants.dart';
+import 'package:tasks_app/core/widgets/loading_widget.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
-import 'package:tasks_app/features/authorization/presentation/widgets/loading.dart';
 
 class SignIn extends StatefulWidget {
 
@@ -31,7 +31,7 @@ class _SignInState extends State<SignIn> {
 
     final authServiceProvider = Provider.of<AuthService>(context);
 
-    return loading ? Loading() : Scaffold(
+    return loading ? LoadingWidget() : Scaffold(
       backgroundColor: Colors.grey[300],
       body: Container(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),

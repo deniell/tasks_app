@@ -19,9 +19,9 @@ class TaskModel extends Task {
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
     return TaskModel(
-      id: int.parse(json['id']),
+      id: json['id'],
       title: json['title'],
-      dueBy: int.parse(json['dueBy']),
+      dueBy: json['dueBy'],
       priority: getPriority(json['priority']),
       description: json['description']
     );

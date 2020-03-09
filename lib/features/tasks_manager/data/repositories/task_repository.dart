@@ -93,6 +93,7 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<Either<Failure, List<app.Task>>> getTasks(
       SortFilter filter, SortDirection direction, String token) async {
+    print("getTask");
     if (await networkInfo.isConnected) {
       try {
         List<app.Task> tasks = await remoteDataSource.getTasks(filter, direction, token);

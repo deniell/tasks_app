@@ -1,13 +1,35 @@
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:tasks_app/core/widgets/loading_widget.dart';
+import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
+import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/widgets/app_drawer.dart';
+import 'package:tasks_app/injection_container.dart';
 
-class TasksList extends StatelessWidget {
+class TasksList extends StatefulWidget {
+  const TasksList({
+    Key key
+  }) : super(key: key);
+
+  @override
+  _TasksListState createState() => _TasksListState();
+}
+
+class _TasksListState extends State<TasksList> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  SortFilter filter;
+  SortDirection direction;
 
   @override
   Widget build(BuildContext context) {
+
+    final authServiceProvider = Provider.of<AuthService>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: AppDrawer(),
@@ -74,17 +96,30 @@ class TasksList extends StatelessWidget {
               color: Colors.grey[700],
             ),
             offset: Offset(0, 100),
-//            elevation: 16,
             padding: EdgeInsets.only(top: 5),
             onSelected: (item)
             {
-              if (item == 1)
-              {
-
-              }
-              else if (item == 2)
-              {
-
+              if (item == 1) {
+                TasksListEvent gEvent = GetTasksList(
+                  filter: SortFilter.title,
+                  direction: SortDirection.asc,
+                  token: authServiceProvider.user.token
+                );
+                dispatchTasksList(gEvent);
+              } else if (item == 2) {
+                TasksListEvent gEvent = GetTasksList(
+                  filter: SortFilter.priority,
+                  direction: SortDirection.asc,
+                  token: authServiceProvider.user.token
+                );
+                dispatchTasksList(gEvent);
+              } else if (item == 3) {
+                TasksListEvent gEvent = GetTasksList(
+                  filter: SortFilter.dueBy,
+                  direction: SortDirection.asc,
+                  token: authServiceProvider.user.token
+                );
+                dispatchTasksList(gEvent);
               }
             },
           ),
@@ -97,11 +132,7 @@ class TasksList extends StatelessWidget {
           )
         ],
       ),
-      body: Container(
-        child: Center(
-          child: Text('TaskList'),
-        ),
-      ),
+      body: buildBody(context),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         onPressed: () {},
@@ -113,5 +144,45 @@ class TasksList extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  BlocProvider<TasksListBloc> buildBody(BuildContext context) {
+    return BlocProvider(
+      create: (_) => di<TasksListBloc>(),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        child: Center(
+          child:
+            BlocBuilder<TasksListBloc, TasksListState>(
+              builder: (context, state) {
+                if (state is Empty) {
+                  if (state.message != null) {
+                    print(state.message);
+                    Flushbar(
+                      message: state.message,
+                      icon: Icon(
+                        Icons.info_outline,
+                        size: 28.0,
+                        color: Colors.blue[300],
+                      ),
+                      duration: Duration(seconds: 5),
+                      leftBarIndicatorColor: Colors.blue[300],
+                    )..show(context);
+                  }
+                  return Text('TaskList');
+                } else if (state is Loading) {
+                  return LoadingWidget();
+                } else {
+                  return Text('Something goes wrong');
+                }
+              }
+            ),
+        ),
+      ),
+    );
+  }
+
+  void dispatchTasksList(GetTasksList gEvent) {
+    di<TasksListBloc>().add(gEvent);
   }
 }

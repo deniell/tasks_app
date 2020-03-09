@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:tasks_app/core/error/failures.dart';
+import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/repositories/auth_repository.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
@@ -57,7 +58,7 @@ class AuthService with ChangeNotifier {
 
     return result.fold(
             (failure) {
-          return _mapFailureToMessage(failure);
+          return mapFailureToMessage(failure);
         },
             (user) {
           _updateUser(user: user);
@@ -73,7 +74,7 @@ class AuthService with ChangeNotifier {
 
     return result.fold(
             (failure) {
-          return _mapFailureToMessage(failure);
+          return mapFailureToMessage(failure);
         },
             (user) {
           _updateUser(user: user);
@@ -81,25 +82,6 @@ class AuthService with ChangeNotifier {
           return null;
         }
     );
-  }
-
-  String _mapFailureToMessage(Failure failure) {
-    switch (failure.runtimeType) {
-      case ServerFailure:
-        return (failure as ServerFailure).message;
-      case ValidationFailure:
-        return (failure as ValidationFailure).message;
-      case UnauthorizedFailure:
-        return (failure as UnauthorizedFailure).message;
-      case UnexpectedFailure:
-        return (failure as UnexpectedFailure).message;
-      case UnknownFailure:
-        return (failure as UnknownFailure).message;
-      case NoInternetFailure:
-        return (failure as NoInternetFailure).message;
-      default:
-        return 'Unexpected error';
-    }
   }
 
   // sign out

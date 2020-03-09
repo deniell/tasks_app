@@ -6,7 +6,7 @@ import 'package:tasks_app/features/authorization/presentation/widgets/wrapper.da
 import 'injection_container.dart' as di;
 
 void main() async {
-  // ensure that widgets initialization finished
+  // ensure that core.widgets initialization finished
   WidgetsFlutterBinding.ensureInitialized();
   // initialize dependency injection
   await di.init();

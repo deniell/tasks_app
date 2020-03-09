@@ -12,6 +12,7 @@ import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasou
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 
 final di = GetIt.instance;
 
@@ -21,6 +22,13 @@ Future<void> init() async {
   Hive.init(appDocumentDir.path);
   Hive.registerAdapter(UserAdapter());
   final userBox = await Hive.openBox('user_entity');
+
+  // Bloc
+  di.registerFactory(
+        () => TasksListBloc(
+        taskRepository: di()
+    ),
+  );
 
   // Core
   di.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(di()));
@@ -60,6 +68,7 @@ Future<void> init() async {
       )
   );
 
+  // Services
   di.registerFactory(
       () => AuthService(
         authRepository: di(),
