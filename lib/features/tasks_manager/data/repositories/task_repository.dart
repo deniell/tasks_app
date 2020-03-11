@@ -9,7 +9,7 @@ import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart' as app;
 
 abstract class TaskRepository {
-  Future<Either<Failure, List<app.Task>>> getTasks(SortFilter filter, SortDirection direction, String token);
+  Future<Either<Failure, List<app.Task>>> getTasks(SortFilter filter, SortDirection direction, String token, int page);
   Future<Either<Failure, app.Task>> createTask(TaskModel taskModel, String token);
   Future<Either<Failure, app.Task>> getTaskDetails(int taskId, String token);
   Future<Either<Failure, bool>> updateTask(TaskModel taskModel, String token);
@@ -92,11 +92,11 @@ class TaskRepositoryImpl implements TaskRepository {
 
   @override
   Future<Either<Failure, List<app.Task>>> getTasks(
-      SortFilter filter, SortDirection direction, String token) async {
+      SortFilter filter, SortDirection direction, String token, int page) async {
     print("getTask");
     if (await networkInfo.isConnected) {
       try {
-        List<app.Task> tasks = await remoteDataSource.getTasks(filter, direction, token);
+        List<app.Task> tasks = await remoteDataSource.getTasks(filter, direction, token, page);
         if (tasks != null) {
           return Right(tasks);
         } else {

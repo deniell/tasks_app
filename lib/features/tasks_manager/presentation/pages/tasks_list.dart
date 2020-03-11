@@ -8,6 +8,8 @@ import 'package:tasks_app/features/authorization/domain/services/auth_service.da
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/widgets/app_drawer.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/widgets/bottom_loader.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/widgets/task_widget.dart';
 import 'package:tasks_app/injection_container.dart';
 
 class TasksList extends StatefulWidget {
@@ -22,9 +24,19 @@ class TasksList extends StatefulWidget {
 class _TasksListState extends State<TasksList> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _scrollController = ScrollController();
+  final _scrollThreshold = 200.0;
   AuthService authServiceProvider;
   SortFilter filter;
   ValueNotifier<SortDirection> sortDirectionNotifier = ValueNotifier<SortDirection>(SortDirection.asc);
+  // current get tasks request to fetch more tasks
+  TasksListEvent gEvent;
+
+  @override
+  void initState() {
+    _scrollController.addListener(_onScroll);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,21 +113,21 @@ class _TasksListState extends State<TasksList> {
             onSelected: (item)
             {
               if (item == 1) {
-                TasksListEvent gEvent = GetTasksList(
+                gEvent = GetTasksList(
                   filter: SortFilter.title,
                   direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
                 );
                 dispatchTasksList(gEvent);
               } else if (item == 2) {
-                TasksListEvent gEvent = GetTasksList(
+                gEvent = GetTasksList(
                   filter: SortFilter.priority,
                   direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
                 );
                 dispatchTasksList(gEvent);
               } else if (item == 3) {
-                TasksListEvent gEvent = GetTasksList(
+                gEvent = GetTasksList(
                   filter: SortFilter.dueBy,
                   direction: sortDirectionNotifier.value,
                   token: authServiceProvider.user.token
@@ -145,16 +157,19 @@ class _TasksListState extends State<TasksList> {
     return BlocProvider(
       create: (_) => di<TasksListBloc>(),
       child: Container(
-        padding: const EdgeInsets.all(10),
+//        padding: const EdgeInsets.all(10),
         child: Center(
           child:
             BlocBuilder<TasksListBloc, TasksListState>(
               builder: (context, state) {
-                if (state is Empty) {
-                  if (state.message != null) {
-                    print(state.message);
+                print("state is: $state");
+                if (state is Uninitialized) {
+                  return LoadingWidget();
+                } else if (state is Empty) {
+                  if (state.errorMessage != null) {
+                    print(state.errorMessage);
                     Flushbar(
-                      message: state.message,
+                      message: state.errorMessage,
                       icon: Icon(
                         Icons.info_outline,
                         size: 28.0,
@@ -164,9 +179,21 @@ class _TasksListState extends State<TasksList> {
                       leftBarIndicatorColor: Colors.blue[300],
                     )..show(context);
                   }
-                  return Text('TaskList');
+                  return Text('No tasks');
                 } else if (state is Loading) {
                   return LoadingWidget();
+                } else if (state is Loaded) {
+                  return ListView.builder(
+                    itemBuilder: (BuildContext context, int index) {
+                      return index >= state.tasks.length
+                          ? BottomLoader()
+                          : TaskWidget(task: state.tasks[index]);
+                    },
+                    itemCount: state.hasReachedMax
+                        ? state.tasks.length
+                        : state.tasks.length + 1,
+                    controller: _scrollController,
+                  );
                 } else {
                   return Text('Something goes wrong');
                 }
@@ -198,7 +225,7 @@ class _TasksListState extends State<TasksList> {
               ),
               onPressed: () {
                 sortDirectionNotifier.value = SortDirection.desc;
-                TasksListEvent gEvent = GetTasksList(
+                gEvent = GetTasksList(
                     filter: SortFilter.dueBy,
                     direction: sortDirectionNotifier.value,
                     token: authServiceProvider.user.token
@@ -221,5 +248,19 @@ class _TasksListState extends State<TasksList> {
       },
       valueListenable: sortDirectionNotifier,
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (maxScroll - currentScroll <= _scrollThreshold) {
+      dispatchTasksList(gEvent);
+    }
   }
 }

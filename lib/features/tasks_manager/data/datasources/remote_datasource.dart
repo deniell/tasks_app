@@ -12,10 +12,10 @@ abstract class RemoteDataSource {
   ///
   /// Get tasks list
   /// Calls the GET /tasks endpoint
-  /// curl -X GET "https://testapi.doitserver.in.ua/api/tasks?sort=title%20asc" -H "accept: application/json" -H "Authorization: Bearer ..."
+  /// curl -X GET "https://testapi.doitserver.in.ua/api/tasks?page=1&sort=title%20asc" -H "accept: application/json" -H "Authorization: Bearer ..."
   /// OK 200
   ///
-  Future<List<Task>> getTasks(SortFilter filter, SortDirection direction, String token);
+  Future<List<Task>> getTasks(SortFilter filter, SortDirection direction, String token, int page);
 
   ///
   /// Create task
@@ -143,9 +143,9 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   }
 
   @override
-  Future<List<Task>> getTasks(SortFilter filter, SortDirection direction, String token) async {
+  Future<List<Task>> getTasks(SortFilter filter, SortDirection direction, String token, int page) async {
 
-    final String url = "$BASE_URL/tasks?sort=${filter.value()}%20${direction.value()}";
+    final String url = "$BASE_URL/tasks?page=$page&sort=${filter.value()}%20${direction.value()}";
 
     final response = await client.get(
         url,
