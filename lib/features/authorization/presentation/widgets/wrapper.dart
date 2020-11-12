@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/authorization/presentation/widgets/authenticate.dart';
 import 'package:tasks_app/core/widgets/loading_widget.dart';
@@ -7,12 +8,14 @@ import 'package:tasks_app/features/tasks_manager/presentation/pages/tasks_list.d
 
 class Wrapper extends StatelessWidget {
 
+  final log = logger.log;
+
   @override
   Widget build(BuildContext context) {
 
     final authServiceProvider = Provider.of<AuthService>(context);
 
-    print(authServiceProvider.user);
+    log.d(authServiceProvider.user);
 
     // return either the TasksList or Authenticate widget
     if (authServiceProvider.user == null) {

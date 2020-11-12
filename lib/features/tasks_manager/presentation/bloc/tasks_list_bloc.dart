@@ -1,11 +1,14 @@
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 
 class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
+
+  final log = logger.log;
   final TaskRepository taskRepository;
 
   TasksListBloc({
@@ -34,17 +37,21 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
     int currentPage = 1;
     if (event is GetTasksList && !_hasReachedMax(currentState)) {
         if (currentState is Uninitialized || currentState is Empty) {
-          print("dispatched event: $event");
+          log.d("dispatched event: $event");
 
 //          yield Loading();
           final tasks = await taskRepository.getTasks(event.filter, event.direction, event.token, currentPage);
 
+          log.d("tasks is: $tasks");
+
           yield* tasks.fold(
             (failure) async* {
+              log.e("failure");
               String message = mapFailureToMessage(failure);
               yield Empty(errorMessage: message);
             },
             (tasks) async* {
+              log.d("success!");
               yield Loaded(tasks: tasks, hasReachedMax: false);
             }
           );

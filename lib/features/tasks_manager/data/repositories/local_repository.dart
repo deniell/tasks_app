@@ -1,6 +1,7 @@
 import 'package:meta/meta.dart';
 import 'package:dartz/dartz.dart';
 import 'package:tasks_app/core/error/failures.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/local_datasource.dart';
 
@@ -18,6 +19,7 @@ abstract class LocalRepository {
 
 class LocalRepositoryImpl implements LocalRepository {
 
+  final log = logger.log;
   final LocalDataSource localDataSource;
 
   LocalRepositoryImpl({
@@ -28,10 +30,10 @@ class LocalRepositoryImpl implements LocalRepository {
   Future<Either<Failure, User>> getUserFromCache() async {
     try {
       User user = await localDataSource.getUserFromCache();
-      print("saved user: $user");
+      log.d("saved user: $user");
       return Right(user);
     } catch (e) {
-      print(e);
+      log.e(e);
       return Left(CacheFailure());
     }
   }
@@ -41,7 +43,7 @@ class LocalRepositoryImpl implements LocalRepository {
     try {
       await localDataSource.removeUserFromCache();
     } catch (e) {
-      print(e);
+      log.e(e);
     }
   }
 
@@ -50,7 +52,7 @@ class LocalRepositoryImpl implements LocalRepository {
     try {
       await localDataSource.saveUser2Cache(user);
     } catch (e) {
-      print(e);
+      log.e(e);
     }
   }
 

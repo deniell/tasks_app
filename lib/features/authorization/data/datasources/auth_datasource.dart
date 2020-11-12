@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/models/user_model.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
@@ -24,6 +25,7 @@ abstract class AuthDataSource {
 
 class AuthDataSourceImpl implements AuthDataSource {
 
+  final log = logger.log;
   final http.Client client;
 
   AuthDataSourceImpl({@required this.client});
@@ -46,8 +48,8 @@ class AuthDataSourceImpl implements AuthDataSource {
       body: json.encode(data)
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 201) {
 
@@ -79,8 +81,8 @@ class AuthDataSourceImpl implements AuthDataSource {
         body: json.encode(data)
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 200) {
 

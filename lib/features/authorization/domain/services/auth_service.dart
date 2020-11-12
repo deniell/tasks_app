@@ -3,12 +3,15 @@ import 'package:meta/meta.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:tasks_app/core/error/failures.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/repositories/auth_repository.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
 
 class AuthService with ChangeNotifier {
+
+  final log = logger.log;
 
   final AuthRepository authRepository;
   final LocalRepository localeRepository;
@@ -28,7 +31,7 @@ class AuthService with ChangeNotifier {
     result.fold(
         (failure) {
           _updateUser(user: null);
-          print((failure as CacheFailure).message);
+          log.e((failure as CacheFailure).message);
         },
         (user) {
           _updateUser(user: user);

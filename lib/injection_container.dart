@@ -23,13 +23,6 @@ Future<void> init() async {
   Hive.registerAdapter(UserAdapter());
   final userBox = await Hive.openBox('user_entity');
 
-  // Bloc
-  di.registerFactory(
-        () => TasksListBloc(
-        taskRepository: di()
-    ),
-  );
-
   // Core
   di.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(di()));
 
@@ -74,6 +67,13 @@ Future<void> init() async {
         authRepository: di(),
         localeRepository: di(),
       )
+  );
+
+  // Bloc
+  di.registerFactory(
+        () => TasksListBloc(
+        taskRepository: di()
+    ),
   );
 }
 

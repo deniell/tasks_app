@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/widgets/loading_widget.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
@@ -23,6 +24,7 @@ class TasksList extends StatefulWidget {
 
 class _TasksListState extends State<TasksList> {
 
+  final log = logger.log;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
@@ -159,46 +161,45 @@ class _TasksListState extends State<TasksList> {
       child: Container(
 //        padding: const EdgeInsets.all(10),
         child: Center(
-          child:
-            BlocBuilder<TasksListBloc, TasksListState>(
-              builder: (context, state) {
-                print("state is: $state");
-                if (state is Uninitialized) {
-                  return LoadingWidget();
-                } else if (state is Empty) {
-                  if (state.errorMessage != null) {
-                    print(state.errorMessage);
-                    Flushbar(
-                      message: state.errorMessage,
-                      icon: Icon(
-                        Icons.info_outline,
-                        size: 28.0,
-                        color: Colors.blue[300],
-                      ),
-                      duration: Duration(seconds: 5),
-                      leftBarIndicatorColor: Colors.blue[300],
-                    )..show(context);
-                  }
-                  return Text('No tasks');
-                } else if (state is Loading) {
-                  return LoadingWidget();
-                } else if (state is Loaded) {
-                  return ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      return index >= state.tasks.length
-                          ? BottomLoader()
-                          : TaskWidget(task: state.tasks[index]);
-                    },
-                    itemCount: state.hasReachedMax
-                        ? state.tasks.length
-                        : state.tasks.length + 1,
-                    controller: _scrollController,
-                  );
-                } else {
-                  return Text('Something goes wrong');
+          child: BlocBuilder<TasksListBloc, TasksListState>(
+            builder: (context, state) {
+              log.d("state is: $state");
+              if (state is Uninitialized) {
+                return LoadingWidget();
+              } else if (state is Empty) {
+                if (state.errorMessage != null) {
+                  log.d(state.errorMessage);
+                  Flushbar(
+                    message: state.errorMessage,
+                    icon: Icon(
+                      Icons.info_outline,
+                      size: 28.0,
+                      color: Colors.blue[300],
+                    ),
+                    duration: Duration(seconds: 5),
+                    leftBarIndicatorColor: Colors.blue[300],
+                  )..show(context);
                 }
+                return Text('No tasks');
+              } else if (state is Loading) {
+                return LoadingWidget();
+              } else if (state is Loaded) {
+                return ListView.builder(
+                  itemBuilder: (BuildContext context, int index) {
+                    return index >= state.tasks.length
+                        ? BottomLoader()
+                        : TaskWidget(task: state.tasks[index]);
+                  },
+                  itemCount: state.hasReachedMax
+                      ? state.tasks.length
+                      : state.tasks.length + 1,
+                  controller: _scrollController,
+                );
+              } else {
+                return Text('Something goes wrong');
               }
-            ),
+            }
+          ),
         ),
       ),
     );

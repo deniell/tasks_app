@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:tasks_app/core/error/failures.dart';
 import 'package:tasks_app/core/network/network_info.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/authorization/data/datasources/auth_datasource.dart';
 import 'package:tasks_app/features/authorization/domain/entities/user.dart';
@@ -12,6 +13,8 @@ abstract class AuthRepository {
 }
 
 class AuthRepositoryImpl implements AuthRepository {
+
+  final log = logger.log;
   final AuthDataSource authDataSource;
   final NetworkInfo networkInfo;
 
@@ -31,7 +34,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }
@@ -51,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }

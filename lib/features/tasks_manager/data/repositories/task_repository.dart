@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:dartz/dartz.dart';
 import 'package:tasks_app/core/error/failures.dart';
 import 'package:tasks_app/core/network/network_info.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/local_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
@@ -17,6 +18,8 @@ abstract class TaskRepository {
 }
 
 class TaskRepositoryImpl implements TaskRepository {
+
+  final log = logger.log;
   final RemoteDataSource remoteDataSource;
   final LocalDataSource localDataSource;
   final NetworkInfo networkInfo;
@@ -38,7 +41,7 @@ class TaskRepositoryImpl implements TaskRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }
@@ -59,7 +62,7 @@ class TaskRepositoryImpl implements TaskRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }
@@ -80,7 +83,7 @@ class TaskRepositoryImpl implements TaskRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }
@@ -93,7 +96,7 @@ class TaskRepositoryImpl implements TaskRepository {
   @override
   Future<Either<Failure, List<app.Task>>> getTasks(
       SortFilter filter, SortDirection direction, String token, int page) async {
-    print("getTask");
+    log.d("getTask");
     if (await networkInfo.isConnected) {
       try {
         List<app.Task> tasks = await remoteDataSource.getTasks(filter, direction, token, page);
@@ -103,7 +106,7 @@ class TaskRepositoryImpl implements TaskRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }
@@ -124,7 +127,7 @@ class TaskRepositoryImpl implements TaskRepository {
           return Left(UnknownFailure());
         }
       } catch (e) {
-        print(e);
+        log.e(e);
         Failure failure = evaluateException(e);
         return Left(failure);
       }

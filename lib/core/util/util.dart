@@ -2,11 +2,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tasks_app/core/error/exceptions.dart';
 import 'package:tasks_app/core/error/failures.dart';
+import 'package:tasks_app/core/util/logger.dart';
 
 ///
 /// Evaluate exact error message from response
 ///
 String getExactErrorMessage(String respBody) {
+
+  final log = logger.log;
 
   if (respBody == null) {
     return null;
@@ -24,7 +27,7 @@ String getExactErrorMessage(String respBody) {
         cause = responseBody['message'];
         cause += ". ";
 
-        print(cause);
+        log.d(cause);
       }
 
       if (responseBody.containsKey('fields')) {
@@ -33,7 +36,7 @@ String getExactErrorMessage(String respBody) {
         cause += " ";
       }
 
-      print(cause);
+      log.d(cause);
     }
 
     return cause;

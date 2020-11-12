@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:meta/meta.dart';
 import 'package:tasks_app/core/constants.dart';
+import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
 import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
@@ -53,6 +54,7 @@ abstract class RemoteDataSource {
 
 class RemoteDataSourceImpl implements RemoteDataSource {
 
+  final log = logger.log;
   final http.Client client;
 
   RemoteDataSourceImpl({
@@ -75,8 +77,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         body: json.encode(data)
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 201) {
 
@@ -103,8 +105,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       },
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 202) {
       return true;
@@ -127,8 +129,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       },
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 200) {
 
@@ -155,8 +157,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         },
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 200) {
 
@@ -196,8 +198,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         body: json.encode(data)
     );
 
-    print(response.statusCode);
-    print(response.body);
+    log.d(response.statusCode);
+    log.d(response.body);
 
     if (response.statusCode == 202) {
       return true;
