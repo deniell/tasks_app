@@ -20,18 +20,18 @@ dependencies:
   flutter:
     sdk: flutter
 
-  provider: ^4.0.4
+  provider: ^4.3.2+2
   flushbar: ^1.10.4
   font_awesome_flutter: ^8.7.0
   http: ^0.12.0+4
   data_connection_checker: ^0.3.4
-  get_it: ^4.0.0
+  get_it: ^5.0.1
   dartz: ^0.8.9
   flutter_spinkit: ^4.1.2
   hive: ^1.4.1+1
   hive_flutter: ^0.3.0+2
-  path_provider: ^1.6.5
-  flutter_bloc: ^3.2.0
+  path_provider: ^1.6.24
+  flutter_bloc: ^6.1.1
   rxdart: ^0.23.1
   logger: ^0.9.4
 

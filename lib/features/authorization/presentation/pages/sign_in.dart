@@ -1,6 +1,6 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as pr;
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/widgets/loading_widget.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
@@ -29,7 +29,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
 
-    final authServiceProvider = Provider.of<AuthService>(context);
+    final authServiceProvider = pr.Provider.of<AuthService>(context);
 
     return loading ? LoadingWidget() : Scaffold(
       backgroundColor: Colors.grey[300],

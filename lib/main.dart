@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as pr;
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/authorization/presentation/widgets/wrapper.dart';
 import 'injection_container.dart' as di;
@@ -20,10 +20,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AuthService>(
+    return pr.ChangeNotifierProvider<AuthService>(
       create: (context) => di<AuthService>(),
       child: MaterialApp(
         home: Wrapper(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }

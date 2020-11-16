@@ -1,28 +1,25 @@
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as pr;
 import 'package:tasks_app/core/util/logger.dart';
-import 'package:tasks_app/core/widgets/loading_widget.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/tasks_list_bloc.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/widgets/app_drawer.dart';
-import 'package:tasks_app/features/tasks_manager/presentation/widgets/bottom_loader.dart';
-import 'package:tasks_app/features/tasks_manager/presentation/widgets/task_widget.dart';
-import 'package:tasks_app/injection_container.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/widgets/tasks_list.dart';
 
-class TasksList extends StatefulWidget {
-  const TasksList({
+class TasksListPage extends StatefulWidget {
+  const TasksListPage({
     Key key
   }) : super(key: key);
 
   @override
-  _TasksListState createState() => _TasksListState();
+  _TasksListPageState createState() => _TasksListPageState();
 }
 
-class _TasksListState extends State<TasksList> {
+class _TasksListPageState extends State<TasksListPage> {
 
   final log = logger.log;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -33,17 +30,20 @@ class _TasksListState extends State<TasksList> {
   ValueNotifier<SortDirection> sortDirectionNotifier = ValueNotifier<SortDirection>(SortDirection.asc);
   // current get tasks request to fetch more tasks
   TasksListEvent gEvent;
+  Widget tasksList;
 
   @override
   void initState() {
     _scrollController.addListener(_onScroll);
+    tasksList = TasksList(scrollController: _scrollController);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    log.d("build Task list page");
 
-    authServiceProvider = Provider.of<AuthService>(context);
+    authServiceProvider = pr.Provider.of<AuthService>(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -83,8 +83,10 @@ class _TasksListState extends State<TasksList> {
                 height: 40,
                 child: Text(
                   'Name',
-                  style: TextStyle(
-                      color: Colors.black, fontSize: 18),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 18
+                  ),
                 ),
               ),
               PopupMenuItem(
@@ -92,8 +94,10 @@ class _TasksListState extends State<TasksList> {
                 height: 40,
                 child: Text(
                   'Priority',
-                  style: TextStyle(
-                      color: Colors.black, fontSize: 18),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 18
+                  ),
                 ),
               ),
               PopupMenuItem(
@@ -101,8 +105,10 @@ class _TasksListState extends State<TasksList> {
                 height: 40,
                 child: Text(
                   'Date',
-                  style: TextStyle(
-                      color: Colors.black, fontSize: 18),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 18
+                  ),
                 ),
               )
             ],
@@ -141,7 +147,7 @@ class _TasksListState extends State<TasksList> {
           sortDirectionBtn()
         ],
       ),
-      body: buildBody(context),
+      body: tasksList,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         onPressed: () {},
@@ -155,58 +161,11 @@ class _TasksListState extends State<TasksList> {
     );
   }
 
-  BlocProvider<TasksListBloc> buildBody(BuildContext context) {
-    return BlocProvider(
-      create: (_) => di<TasksListBloc>(),
-      child: Container(
-//        padding: const EdgeInsets.all(10),
-        child: Center(
-          child: BlocBuilder<TasksListBloc, TasksListState>(
-            builder: (context, state) {
-              log.d("state is: $state");
-              if (state is Uninitialized) {
-                return LoadingWidget();
-              } else if (state is Empty) {
-                if (state.errorMessage != null) {
-                  log.d(state.errorMessage);
-                  Flushbar(
-                    message: state.errorMessage,
-                    icon: Icon(
-                      Icons.info_outline,
-                      size: 28.0,
-                      color: Colors.blue[300],
-                    ),
-                    duration: Duration(seconds: 5),
-                    leftBarIndicatorColor: Colors.blue[300],
-                  )..show(context);
-                }
-                return Text('No tasks');
-              } else if (state is Loading) {
-                return LoadingWidget();
-              } else if (state is Loaded) {
-                return ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
-                    return index >= state.tasks.length
-                        ? BottomLoader()
-                        : TaskWidget(task: state.tasks[index]);
-                  },
-                  itemCount: state.hasReachedMax
-                      ? state.tasks.length
-                      : state.tasks.length + 1,
-                  controller: _scrollController,
-                );
-              } else {
-                return Text('Something goes wrong');
-              }
-            }
-          ),
-        ),
-      ),
-    );
-  }
-
+  ///
+  /// Send event to Tasks list bloc
+  ///
   void dispatchTasksList(GetTasksList gEvent) {
-    di<TasksListBloc>().add(gEvent);
+    BlocProvider.of<TasksListBloc>(context).add(gEvent);
   }
 
   ///
