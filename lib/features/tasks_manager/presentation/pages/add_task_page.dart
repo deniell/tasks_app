@@ -1,12 +1,28 @@
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/util/logger.dart';
+import 'package:tasks_app/core/util/util.dart';
+import 'package:tasks_app/core/widgets/loading_widget.dart';
+import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
+import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
+import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
+import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
+import 'package:tasks_app/injection_container.dart';
 
 class AddTaskPage extends StatefulWidget {
-  AddTaskPage({Key key}) : super(key: key);
+  final Function dispatchTasksList;
+
+  AddTaskPage({
+    @required this.dispatchTasksList,
+    Key key
+  }) : super(key: key);
 
   @override
   _AddTaskPageState createState() => _AddTaskPageState();
@@ -15,11 +31,22 @@ class AddTaskPage extends StatefulWidget {
 class _AddTaskPageState extends State<AddTaskPage> {
 
   final log = logger.log;
-  TextEditingController _controller1;
+  final TaskRepository taskRepository = di();
+  final _formKey = GlobalKey<FormState>();
+  final FocusNode _titleFocus = FocusNode();
+  final FocusNode _descriptionFocus = FocusNode();
+  // widget state
+  bool loading = false;
+  // task priority
+  Priority _priority;
+  // due to this time task should be done
+  int _dueBy;
+  // text field state
+  String _title = '';
+  String _description = '';
 
   @override
   void initState() {
-    _controller1 = TextEditingController(text: DateTime.now().toString());
     super.initState();
   }
 
@@ -34,7 +61,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
     final Size screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
+    return loading ? LoadingWidget() :  Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
         title: Text(
@@ -70,21 +98,24 @@ class _AddTaskPageState extends State<AddTaskPage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: TextFormField(
-                // focusNode: _emailFocus,
-                decoration: textInputDecoration.copyWith(hintText: ''),
-                keyboardType: TextInputType.text,
-                validator: (val) => val.isEmpty ? 'Enter an email' : null,
-                maxLines: 5,
-                minLines: 3,
-                onChanged: (val) {
-                  // setState(() => email = val);
-                },
-                // initialValue: email != null ? email : "",
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (term){
-                  // _fieldFocusChange(context, _emailFocus, _passwordFocus);
-                }
+              child: Form(
+                key: _formKey,
+                child: TextFormField(
+                  focusNode: _titleFocus,
+                  decoration: textInputDecoration.copyWith(hintText: ''),
+                  keyboardType: TextInputType.text,
+                  validator: (val) => val.isEmpty ? 'Enter a title' : null,
+                  maxLines: 5,
+                  minLines: 3,
+                  onChanged: (val) {
+                    _title = val;
+                  },
+                  initialValue: _title != null ? _title : "",
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (term){
+                    _fieldFocusChange(context, _titleFocus, _descriptionFocus);
+                  }
+                ),
               ),
             ),
             Padding(
@@ -122,9 +153,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   'Low',
                 ],
                 buttonValues: [
-                  "HIGH",
-                  "MEDIUM",
-                  "LOW",
+                  Priority.High,
+                  Priority.Normal,
+                  Priority.Low,
                 ],
                 buttonTextStyle: const ButtonTextStyle(
                   selectedColor: Colors.white,
@@ -132,7 +163,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   textStyle: TextStyle(fontSize: 16)
                 ),
                 radioButtonValue: (value) {
-                  log.d(value);
+                  log.d("new priority is: $value");
+                  _priority = value;
                 },
                 selectedColor: Theme.of(context).accentColor,
               ),
@@ -163,19 +195,18 @@ class _AddTaskPageState extends State<AddTaskPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: TextFormField(
-              // focusNode: _emailFocus,
+                focusNode: _descriptionFocus,
                 decoration: textInputDecoration.copyWith(hintText: ''),
                 keyboardType: TextInputType.text,
-                validator: (val) => val.isEmpty ? 'Enter an email' : null,
                 maxLines: 5,
                 minLines: 3,
                 onChanged: (val) {
-                  // setState(() => email = val);
+                  _description = val;
                 },
-                // initialValue: email != null ? email : "",
-                textInputAction: TextInputAction.next,
+                initialValue: _description != null ? _description : "",
+                textInputAction: TextInputAction.done,
                 onFieldSubmitted: (term){
-                  // _fieldFocusChange(context, _emailFocus, _passwordFocus);
+                  _descriptionFocus.unfocus();
                 }
               ),
             ),
@@ -190,24 +221,19 @@ class _AddTaskPageState extends State<AddTaskPage> {
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: DateTimePicker(
+                initialValue: _dueBy != null ? DateTime.fromMicrosecondsSinceEpoch(_dueBy, isUtc: true).toString() : '',
                 type: DateTimePickerType.dateTimeSeparate,
                 dateMask: 'd MMM, yyyy',
-                controller: _controller1,
-                //initialValue: _initialValue,
                 firstDate: DateTime.now(),
-                lastDate: DateTime(2100),
+                lastDate: DateTime(2200),
                 icon: Icon(Icons.event),
                 dateLabelText: 'Date',
                 timeLabelText: "Time",
                 onChanged: (val)
                 {
-                  log.d("time1: $val");
-                  DateTime date = DateTime.parse(val);
-                  log.d("time after: $date");
-                },
-                onSaved: (val)
-                {
-                  log.d("time2: $val");
+                  log.d("New event time is: $val");
+                  _dueBy = DateTime.parse(val).microsecondsSinceEpoch;
+                  log.d("New event time in milliseconds since epoch: $_dueBy");
                 }
               ),
             ),
@@ -218,7 +244,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 children: [
                   FlatButton(
                     child: Text(
-                      "Create event",
+                      "Create task",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 19
@@ -227,7 +253,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     color: Colors.blueAccent,
                     onPressed: ()
                     {
-
+                      _addTask();
                     },
                     minWidth: screenSize.width,
                     height: 50,
@@ -239,5 +265,89 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
       ),
     );
+  }
+
+  ///
+  /// Change fields focus nod
+  ///
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus,FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
+  }
+
+  ///
+  /// Launch log in process
+  ///
+  Future<void> _addTask() async
+  {
+    if(_formKey.currentState.validate()) {
+
+      if (_priority == null) {
+        Flushbar(
+          message: 'Please choose a priority',
+          icon: Icon(
+            Icons.info_outline,
+            size: 28.0,
+            color: Colors.red,
+          ),
+          duration: Duration(seconds: 5),
+          leftBarIndicatorColor: Colors.red,
+        )..show(context);
+
+        return;
+      }
+
+      // create task model
+      TaskModel taskModel = TaskModel(
+        title: _title,
+        dueBy: _dueBy != null ? (_dueBy~/1000000).toInt() : null,
+        priority: _priority,
+        description: _description
+      );
+
+      // get user token
+      String token = Provider.of<AuthService>(context, listen: false).user.token;
+
+      setState(() => loading = true);
+
+      // sent API request
+      final result = await taskRepository.createTask(taskModel, token);
+
+      setState(() => loading = false);
+
+      // evaluate result of adding the task
+      result.fold(
+        (failure){
+          log.e("failure");
+          String message = mapFailureToMessage(failure);
+          Flushbar(
+            message: message,
+            icon: Icon(
+              Icons.info_outline,
+              size: 28.0,
+              color: Colors.red,
+            ),
+            duration: Duration(seconds: 5),
+            leftBarIndicatorColor: Colors.red,
+          )..show(context);
+          return;
+        },
+        (tasks) {
+          log.d("success!");
+          Flushbar(
+            message: 'Task successfully created!',
+            icon: Icon(
+              Icons.info_outline,
+              size: 28.0,
+              color: Colors.blue[300],
+            ),
+            duration: Duration(seconds: 5),
+            leftBarIndicatorColor: Colors.blue[300],
+          )..show(context);
+          // update tasks list
+          widget.dispatchTasksList();
+        }
+      );
+    }
   }
 }

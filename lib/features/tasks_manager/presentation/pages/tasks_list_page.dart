@@ -129,26 +129,14 @@ class _TasksListPageState extends State<TasksListPage> {
             onSelected: (item)
             {
               if (item == 1) {
-                gEvent = GetTasksList(
-                  filter: SortFilter.title,
-                  direction: sortDirectionNotifier.value,
-                  token: authServiceProvider.user.token
-                );
-                dispatchTasksList(gEvent);
+                filter = SortFilter.title;
+                dispatchTasksList();
               } else if (item == 2) {
-                gEvent = GetTasksList(
-                  filter: SortFilter.priority,
-                  direction: sortDirectionNotifier.value,
-                  token: authServiceProvider.user.token
-                );
-                dispatchTasksList(gEvent);
+                filter = SortFilter.priority;
+                dispatchTasksList();
               } else if (item == 3) {
-                gEvent = GetTasksList(
-                  filter: SortFilter.dueBy,
-                  direction: sortDirectionNotifier.value,
-                  token: authServiceProvider.user.token
-                );
-                dispatchTasksList(gEvent);
+                filter = SortFilter.dueBy;
+                dispatchTasksList();
               }
             },
           ),
@@ -162,7 +150,9 @@ class _TasksListPageState extends State<TasksListPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddTaskPage()
+              builder: (context) => AddTaskPage(
+                dispatchTasksList: dispatchTasksList,
+              )
             )
           );
         },
@@ -179,7 +169,13 @@ class _TasksListPageState extends State<TasksListPage> {
   ///
   /// Send event to Tasks list bloc
   ///
-  void dispatchTasksList(GetTasksList gEvent) {
+  void dispatchTasksList() {
+    // create bloc event
+    gEvent = GetTasksList(
+        filter: filter,
+        direction: sortDirectionNotifier.value,
+        token: authServiceProvider.user.token
+    );
     BlocProvider.of<TasksListBloc>(context).add(gEvent);
   }
 
@@ -200,12 +196,7 @@ class _TasksListPageState extends State<TasksListPage> {
               ),
               onPressed: () {
                 sortDirectionNotifier.value = SortDirection.desc;
-                gEvent = GetTasksList(
-                    filter: SortFilter.dueBy,
-                    direction: sortDirectionNotifier.value,
-                    token: authServiceProvider.user.token
-                );
-                dispatchTasksList(gEvent);
+                dispatchTasksList();
               },
             );
           case SortDirection.desc:
@@ -216,6 +207,7 @@ class _TasksListPageState extends State<TasksListPage> {
               ),
               onPressed: () {
                 sortDirectionNotifier.value = SortDirection.asc;
+                dispatchTasksList();
               },
             );
         }
@@ -235,7 +227,7 @@ class _TasksListPageState extends State<TasksListPage> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      dispatchTasksList(gEvent);
+      dispatchTasksList();
     }
   }
 }

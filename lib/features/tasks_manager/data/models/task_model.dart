@@ -4,7 +4,7 @@ import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
 class TaskModel extends Task {
 
   TaskModel({
-    @required int id,
+    int id,
     @required String title,
     int dueBy,
     Priority priority,
