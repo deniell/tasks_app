@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart' as pr;
@@ -7,6 +8,7 @@ import 'package:tasks_app/features/authorization/domain/services/auth_service.da
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/tasks_list_bloc.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/pages/add_task_page.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/widgets/app_drawer.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/widgets/tasks_list.dart';
 
@@ -42,6 +44,12 @@ class _TasksListPageState extends State<TasksListPage> {
   @override
   Widget build(BuildContext context) {
     log.d("build Task list page");
+
+    // prevent auto-rotate screen to landscape position
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     authServiceProvider = pr.Provider.of<AuthService>(context);
 
@@ -150,7 +158,14 @@ class _TasksListPageState extends State<TasksListPage> {
       body: tasksList,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddTaskPage()
+            )
+          );
+        },
         tooltip: 'Add task',
         child: Icon(
           Icons.add,

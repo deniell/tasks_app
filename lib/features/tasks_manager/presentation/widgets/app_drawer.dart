@@ -21,16 +21,16 @@ class AppDrawer extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
-              height: 100,
+              height: 56,
               color: Colors.grey[300],
               child: Row(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(10),
                     child: Icon(
                       FontAwesomeIcons.tools,
                       color: Colors.grey[700],
-                      size: 40,
+                      size: 35,
                     ),
                   ),
                   Padding(
@@ -39,7 +39,7 @@ class AppDrawer extends StatelessWidget {
                       "Preferences",
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w500
                       ),
                     ),
@@ -60,7 +60,7 @@ class AppDrawer extends StatelessWidget {
               title: Text(
                 "Settings",
                 style: const TextStyle(
-                  fontSize: 18
+                  fontSize: 16
                 ),
               ),
               onTap: () {}
@@ -78,7 +78,7 @@ class AppDrawer extends StatelessWidget {
               title: Text(
                 "About",
                 style: const TextStyle(
-                  fontSize: 18
+                  fontSize: 16
                 ),
               ),
               onTap: () {}
@@ -96,7 +96,7 @@ class AppDrawer extends StatelessWidget {
               title: Text(
                 "Log out",
                 style: const TextStyle(
-                  fontSize: 18
+                  fontSize: 16
                 ),
               ),
               onTap: () => authServiceProvider.signOut(),
