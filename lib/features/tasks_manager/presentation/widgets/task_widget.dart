@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/tasks_list_bloc.dart';
-import 'package:tasks_app/features/tasks_manager/presentation/pages/task_details.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/pages/task_details_page.dart';
 
 class TaskWidget extends StatelessWidget {
   final log = logger.log;
@@ -112,7 +112,7 @@ class TaskWidget extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (_) => BlocProvider.value(
                     value: BlocProvider.of<TasksListBloc>(context, listen: true),
-                    child: TaskDetails(task: task)
+                    child: TaskDetailsPage(task: task)
                   )
                 )
               );

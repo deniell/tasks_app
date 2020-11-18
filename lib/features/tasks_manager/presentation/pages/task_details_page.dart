@@ -11,21 +11,22 @@ import 'package:tasks_app/features/authorization/domain/services/auth_service.da
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/pages/edit_task_page.dart';
 import 'package:tasks_app/injection_container.dart';
 
-class TaskDetails extends StatefulWidget {
+class TaskDetailsPage extends StatefulWidget {
   final Task task;
 
-  TaskDetails({
+  TaskDetailsPage({
   @required this.task,
   Key key
   }) : super(key: key);
 
 @override
-_TaskDetailsState createState() => _TaskDetailsState();
+_TaskDetailsPageState createState() => _TaskDetailsPageState();
 }
 
-class _TaskDetailsState extends State<TaskDetails> {
+class _TaskDetailsPageState extends State<TaskDetailsPage> {
 
   final log = logger.log;
   // widget state
@@ -73,6 +74,15 @@ class _TaskDetailsState extends State<TaskDetails> {
             color: Colors.grey[700],
             onPressed: () {
               log.d("Go to edit task page");
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: BlocProvider.of<TasksListBloc>(context, listen: true),
+                    child: EditTaskPage(task: widget.task)
+                  )
+                ),
+                  ModalRoute.withName("/")
+              );
             }
           )
         ],
