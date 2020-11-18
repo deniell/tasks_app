@@ -1,7 +1,10 @@
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/tasks_list_bloc.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/pages/task_details.dart';
 
 class TaskWidget extends StatelessWidget {
   final log = logger.log;
@@ -15,10 +18,15 @@ class TaskWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final DateTime date = DateTime.fromMicrosecondsSinceEpoch((task.dueBy*1000000));
-    log.d("task ${task.title} date: $date");
-    final DateFormat formatter = DateFormat('MM/dd/yy');
-    final String formatted = formatter.format(date);
+    String formatted = '';
+    try {
+      final DateTime date = DateTime.fromMicrosecondsSinceEpoch((task.dueBy*1000000));
+      log.d("task ${task.title} date: $date");
+      final DateFormat formatter = DateFormat('MM/dd/yy');
+      formatted = formatter.format(date);
+    } catch (e) {
+      log.e(e);
+    }
 
     return Card(
       elevation: 2.0,
@@ -31,10 +39,12 @@ class TaskWidget extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Padding(
+                  Container(
+                    width: 280,
                     padding: const EdgeInsets.all(10),
                     child: Text(
                       task.title,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold
@@ -88,8 +98,7 @@ class TaskWidget extends StatelessWidget {
             ],
           ),
           InkWell(
-            child:
-            Padding(
+            child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Icon(
                 Icons.arrow_forward_ios_rounded,
@@ -98,20 +107,19 @@ class TaskWidget extends StatelessWidget {
             ),
             onTap: () {
               log.d("Open task info page");
+              log.d("test context: ${BlocProvider.of<TasksListBloc>(context).currentPage}");
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: BlocProvider.of<TasksListBloc>(context, listen: true),
+                    child: TaskDetails(task: task)
+                  )
+                )
+              );
             },
           ),
         ],
       )
-    );
-      ListTile(
-      leading: Text(
-        '${task.id}',
-        style: TextStyle(fontSize: 10.0),
-      ),
-      title: Text(task.title),
-      isThreeLine: true,
-      subtitle: Text(task.priority.toString()),
-      dense: true,
     );
   }
 }

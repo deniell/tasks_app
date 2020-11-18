@@ -215,7 +215,7 @@ enum SortFilter {
   title, priority, dueBy
 }
 
-extension on SortFilter {
+extension TaskSortFilter on SortFilter {
   String value() {
     return this.toString().split('.').last;
   }
@@ -225,7 +225,7 @@ enum SortDirection {
   asc, desc
 }
 
-extension on SortDirection {
+extension TaskSortDirection on SortDirection {
   String value() {
     return this.toString().split('.').last;
   }

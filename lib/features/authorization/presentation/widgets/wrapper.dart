@@ -18,7 +18,7 @@ class Wrapper extends StatelessWidget {
 
     final authServiceProvider = pr.Provider.of<AuthService>(context);
 
-    log.d(authServiceProvider.user);
+    log.d(authServiceProvider.user?.token);
 
     // return either the TasksList or Authenticate widget
     if (authServiceProvider.user == null) {

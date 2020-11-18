@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart' as pr;
+import 'package:provider/provider.dart';
 import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
@@ -27,11 +27,7 @@ class _TasksListPageState extends State<TasksListPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
-  AuthService authServiceProvider;
-  SortFilter filter;
   ValueNotifier<SortDirection> sortDirectionNotifier = ValueNotifier<SortDirection>(SortDirection.asc);
-  // current get tasks request to fetch more tasks
-  TasksListEvent gEvent;
   Widget tasksList;
 
   @override
@@ -43,6 +39,7 @@ class _TasksListPageState extends State<TasksListPage> {
 
   @override
   Widget build(BuildContext context) {
+
     log.d("build Task list page");
 
     // prevent auto-rotate screen to landscape position
@@ -50,8 +47,6 @@ class _TasksListPageState extends State<TasksListPage> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
-    authServiceProvider = pr.Provider.of<AuthService>(context);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -83,7 +78,7 @@ class _TasksListPageState extends State<TasksListPage> {
                 child: Text(
                   'Sort by',
                   style: TextStyle(
-                      color: Colors.grey[600], fontSize: 18),
+                    color: Colors.grey[600], fontSize: 18),
                 ),
               ),
               PopupMenuItem(
@@ -129,14 +124,20 @@ class _TasksListPageState extends State<TasksListPage> {
             onSelected: (item)
             {
               if (item == 1) {
-                filter = SortFilter.title;
-                dispatchTasksList();
+                BlocProvider.of<TasksListBloc>(context).filter = SortFilter.title;
+                // get user token
+                String token = Provider.of<AuthService>(context, listen: false).user.token;
+                BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
               } else if (item == 2) {
-                filter = SortFilter.priority;
-                dispatchTasksList();
+                BlocProvider.of<TasksListBloc>(context).filter = SortFilter.priority;
+                // get user token
+                String token = Provider.of<AuthService>(context, listen: false).user.token;
+                BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
               } else if (item == 3) {
-                filter = SortFilter.dueBy;
-                dispatchTasksList();
+                BlocProvider.of<TasksListBloc>(context).filter = SortFilter.dueBy;
+                // get user token
+                String token = Provider.of<AuthService>(context, listen: false).user.token;
+                BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
               }
             },
           ),
@@ -147,11 +148,11 @@ class _TasksListPageState extends State<TasksListPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blueAccent,
         onPressed: () {
-          Navigator.push(
-            context,
+          Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => AddTaskPage(
-                dispatchTasksList: dispatchTasksList,
+              builder: (_) => BlocProvider.value(
+                value: BlocProvider.of<TasksListBloc>(context, listen: true),
+                child: AddTaskPage()
               )
             )
           );
@@ -167,16 +168,20 @@ class _TasksListPageState extends State<TasksListPage> {
   }
 
   ///
-  /// Send event to Tasks list bloc
+  /// No tasks widget
   ///
-  void dispatchTasksList() {
-    // create bloc event
-    gEvent = GetTasksList(
-        filter: filter,
-        direction: sortDirectionNotifier.value,
-        token: authServiceProvider.user.token
+  Widget noTasks() {
+    return Container(
+      padding: const EdgeInsets.only(top: 50),
+      child: Text(
+        "You have no tasks.",
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500
+        ),
+      ),
     );
-    BlocProvider.of<TasksListBloc>(context).add(gEvent);
   }
 
   ///
@@ -195,8 +200,11 @@ class _TasksListPageState extends State<TasksListPage> {
                 color: Colors.grey[700],
               ),
               onPressed: () {
+                BlocProvider.of<TasksListBloc>(context).direction = SortDirection.desc;
+                // get user token
+                String token = Provider.of<AuthService>(context, listen: false).user.token;
+                BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
                 sortDirectionNotifier.value = SortDirection.desc;
-                dispatchTasksList();
               },
             );
           case SortDirection.desc:
@@ -206,8 +214,11 @@ class _TasksListPageState extends State<TasksListPage> {
                 color: Colors.grey[700],
               ),
               onPressed: () {
+                BlocProvider.of<TasksListBloc>(context).direction = SortDirection.asc;
+                // get user token
+                String token = Provider.of<AuthService>(context, listen: false).user.token;
+                BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
                 sortDirectionNotifier.value = SortDirection.asc;
-                dispatchTasksList();
               },
             );
         }
@@ -220,6 +231,7 @@ class _TasksListPageState extends State<TasksListPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    sortDirectionNotifier.dispose();
     super.dispose();
   }
 
@@ -227,7 +239,9 @@ class _TasksListPageState extends State<TasksListPage> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      dispatchTasksList();
+      // get user token
+      String token = Provider.of<AuthService>(context, listen: false).user.token;
+      BlocProvider.of<TasksListBloc>(context).add(GetTasksList(token: token));
     }
   }
 }

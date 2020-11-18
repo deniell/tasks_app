@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tasks_app/core/error/failures.dart';
 import 'package:tasks_app/core/util/logger.dart';
 import 'package:tasks_app/core/util/util.dart';
+import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasource.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
 import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
@@ -13,6 +14,9 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
 
   final log = logger.log;
   final TaskRepository taskRepository;
+  int currentPage = 1;
+  SortFilter filter = SortFilter.priority;
+  SortDirection direction = SortDirection.asc;
 
   TasksListBloc({
     @required this.taskRepository
@@ -33,15 +37,12 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
 
   @override
   Stream<TasksListState> mapEventToState(TasksListEvent event) async* {
-    log.d("Task list event: $event");
+    log.d("dispatched event: $event");
     final currentState = state;
-    int currentPage = 1;
     if (event is GetTasksList && !_hasReachedMax(currentState)) {
       if (currentState is Uninitialized || currentState is Empty) {
-        log.d("dispatched event: $event");
 
-        // yield Loading();
-        final tasks = await taskRepository.getTasks(event.filter, event.direction, event.token, currentPage);
+        final tasks = await taskRepository.getTasks(filter, direction, event.token, currentPage);
 
         log.d("tasks is: $tasks");
 
@@ -49,7 +50,7 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
         log.d("state become: $state");
       } else if (currentState is Loaded) {
 
-        final tasks = await taskRepository.getTasks(event.filter, event.direction, event.token, currentPage);
+        final tasks = await taskRepository.getTasks(filter, direction, event.token, currentPage);
 
         yield* tasks.fold(
           (failure) async* {
@@ -71,6 +72,14 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
           }
         );
       }
+    } else if (event is RefreshTasksList) {
+
+      final tasks = await taskRepository.getTasks(filter, direction, event.token, currentPage);
+
+      log.d("tasks is: $tasks");
+
+      yield* _evaluateTasksState(tasks);
+      log.d("state become: $state");
     }
   }
 
@@ -83,7 +92,11 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
       },
       (tasks) {
         log.d("success!");
-        return Loaded(tasks: tasks, hasReachedMax: false);
+        // if fetched max tasks on current page
+        if (tasks.length == 15) {
+          currentPage++;
+        }
+        return Loaded(tasks: tasks, hasReachedMax: true);
       }
     );
   }

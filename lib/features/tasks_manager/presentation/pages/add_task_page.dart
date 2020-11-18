@@ -3,6 +3,7 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/util/logger.dart';
@@ -12,13 +13,13 @@ import 'package:tasks_app/features/authorization/domain/services/auth_service.da
 import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
+import 'package:tasks_app/features/tasks_manager/presentation/bloc/tasks_list_event.dart';
 import 'package:tasks_app/injection_container.dart';
 
 class AddTaskPage extends StatefulWidget {
-  final Function dispatchTasksList;
 
   AddTaskPage({
-    @required this.dispatchTasksList,
     Key key
   }) : super(key: key);
 
@@ -59,7 +60,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
     final Size screenSize = MediaQuery.of(context).size;
 
-    return loading ? LoadingWidget() :  Scaffold(
+  return loading ? LoadingWidget() :  Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
@@ -76,7 +77,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
         ),
       ),
       body: Container(
-        // padding: const EdgeInsets.all(10),
         child: Column(
           children: [
             Row(
@@ -105,12 +105,13 @@ class _AddTaskPageState extends State<AddTaskPage> {
                   validator: (val) => val.isEmpty ? 'Enter a title' : null,
                   maxLines: 5,
                   minLines: 3,
+                  maxLength: 255,
                   onChanged: (val) {
                     _title = val;
                   },
                   initialValue: _title != null ? _title : "",
                   textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (term){
+                  onFieldSubmitted: (term) {
                     _fieldFocusChange(context, _titleFocus, _descriptionFocus);
                   }
                 ),
@@ -203,7 +204,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 },
                 initialValue: _description != null ? _description : "",
                 textInputAction: TextInputAction.done,
-                onFieldSubmitted: (term){
+                onFieldSubmitted: (term) {
                   _descriptionFocus.unfocus();
                 }
               ),
@@ -274,7 +275,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   ///
-  /// Launch log in process
+  /// Add task
   ///
   Future<void> _addTask() async
   {
@@ -343,7 +344,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
             leftBarIndicatorColor: Colors.blue[300],
           )..show(context);
           // update tasks list
-          widget.dispatchTasksList();
+          BlocProvider.of<TasksListBloc>(context).add(RefreshTasksList(token: token));
         }
       );
     }
