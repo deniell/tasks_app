@@ -64,9 +64,9 @@ class TasksListBloc extends Bloc<TasksListEvent, TasksListState> {
             yield tasks.isEmpty
               ? currentState.copyWith(hasReachedMax: true)
               : Loaded(
-                  tasks: currentState.tasks + tasks,
-                  hasReachedMax: false,
-                  errorMessage: null
+                tasks: currentState.tasks + tasks,
+                hasReachedMax: false,
+                errorMessage: null
             );
           }
         );

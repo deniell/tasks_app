@@ -25,8 +25,8 @@ enum Priority {
   High, Normal, Low
 }
 
-extension on Priority {
-  String value() {
+extension PriorityValue on Priority {
+  String get value {
     return this.toString().split('.').last;
   }
 }

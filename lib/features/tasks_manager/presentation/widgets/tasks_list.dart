@@ -22,7 +22,7 @@ class TasksList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-       padding: const EdgeInsets.all(10),
+       padding: const EdgeInsets.all(0),
         child: Center(
           child: BlocConsumer<TasksListBloc, TasksListState>(
             listener: (context, state) {
@@ -58,6 +58,7 @@ class TasksList extends StatelessWidget {
               } else if (state is Loaded) {
                 return ListView.builder(
                   itemBuilder: (BuildContext context, int index) {
+                    log.d("index: $index, state.tasks.length: ${state.tasks.length}, state.hasReachedMax: ${state.hasReachedMax}");
                     if (state.tasks.length == 0 && index == 0) {
                       return noTasks();
                     } else {

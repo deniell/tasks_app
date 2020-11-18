@@ -3,7 +3,6 @@ import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/util/logger.dart';
@@ -13,7 +12,6 @@ import 'package:tasks_app/features/authorization/domain/services/auth_service.da
 import 'package:tasks_app/features/tasks_manager/data/models/task_model.dart';
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
 import 'package:tasks_app/features/tasks_manager/domain/entities/task.dart';
-import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
 import 'package:tasks_app/injection_container.dart';
 
 class AddTaskPage extends StatefulWidget {
