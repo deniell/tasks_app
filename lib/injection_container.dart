@@ -1,4 +1,5 @@
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -23,56 +24,62 @@ Future<void> init() async {
   Hive.registerAdapter(UserAdapter());
   final userBox = await Hive.openBox('user_entity');
 
-  // Core
-  di.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(di()));
-
   // External
   di.registerLazySingleton(() => http.Client());
   di.registerLazySingleton(() => DataConnectionChecker());
+  di.registerLazySingleton(() => Connectivity());
+
+  // Core
+  di.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(
+      connectionChecker: di(),
+      connectivity: di()
+    )
+  );
 
   // Data sources
   di.registerLazySingleton<AuthDataSource>(
-      () => AuthDataSourceImpl(client: di()),
+    () => AuthDataSourceImpl(client: di()),
   );
   di.registerLazySingleton<LocalDataSource>(
-      () => LocalDataSourceImpl(),
+    () => LocalDataSourceImpl(),
   );
   di.registerLazySingleton<RemoteDataSource>(
-      () => RemoteDataSourceImpl(client: di())
+    () => RemoteDataSourceImpl(client: di())
   );
 
   // Repository
   di.registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryImpl(
-        authDataSource: di(),
-        networkInfo: di(),
-      )
+    () => AuthRepositoryImpl(
+      authDataSource: di(),
+      networkInfo: di(),
+    )
   );
   di.registerLazySingleton<LocalRepository>(
-      () => LocalRepositoryImpl(
-        localDataSource: di(),
-      )
+    () => LocalRepositoryImpl(
+      localDataSource: di(),
+    )
   );
   di.registerLazySingleton<TaskRepository>(
-      () => TaskRepositoryImpl(
-        remoteDataSource: di(),
-        localDataSource: di(),
-        networkInfo: di()
-      )
+    () => TaskRepositoryImpl(
+      remoteDataSource: di(),
+      localDataSource: di(),
+      networkInfo: di()
+    )
   );
 
   // Services
   di.registerFactory(
-      () => AuthService(
-        authRepository: di(),
-        localeRepository: di(),
-      )
+    () => AuthService(
+      authRepository: di(),
+      localeRepository: di(),
+    )
   );
 
   // Bloc
   di.registerFactory(
-        () => TasksListBloc(
-        taskRepository: di()
+    () => TasksListBloc(
+    taskRepository: di()
     ),
   );
 }

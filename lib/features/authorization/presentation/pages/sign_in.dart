@@ -1,5 +1,6 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart' as pr;
 import 'package:tasks_app/core/constants.dart';
 import 'package:tasks_app/core/widgets/loading_widget.dart';
@@ -28,6 +29,12 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
+
+    // prevent auto-rotate screen to landscape position
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     final authServiceProvider = pr.Provider.of<AuthService>(context);
 

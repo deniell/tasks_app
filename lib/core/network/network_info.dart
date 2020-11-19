@@ -1,4 +1,6 @@
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:tasks_app/core/util/logger.dart';
+import 'package:connectivity/connectivity.dart';
 
 ///
 /// Supplies information about internet connection
@@ -8,10 +10,26 @@ abstract class NetworkInfo {
 }
 
 class NetworkInfoImpl implements NetworkInfo {
-  final DataConnectionChecker connectionChecker;
 
-  NetworkInfoImpl(this.connectionChecker);
+  final log = logger.log;
+  final DataConnectionChecker connectionChecker;
+  final Connectivity connectivity;
+
+  NetworkInfoImpl({
+    this.connectionChecker,
+    this.connectivity
+  });
 
   @override
-  Future<bool> get isConnected => connectionChecker.hasConnection;
+  Future<bool> get isConnected async {
+
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult != ConnectivityResult.none) {
+      log.d("connectivity is: $connectivityResult");
+      return true;
+    } else {
+      log.d("connection status is: ${await connectionChecker.connectionStatus}");
+      return connectionChecker.hasConnection;
+    }
+  }
 }
