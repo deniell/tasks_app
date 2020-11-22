@@ -87,8 +87,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           )
         ],
       ),
-      body: Container(
-        child: Column(
+      body: SingleChildScrollView(
+        child: ListBody(
           children: [
             SizedBox(
               width: screenSize.width,
@@ -233,32 +233,24 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 ),
               ),
             ],
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  FlatButton(
-                    child: Text(
-                      "Delete task",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 19
-                      ),
-                    ),
-                    color: Colors.blueGrey,
-                    onPressed: ()
-                    {
-                      _deleteTask();
-                    },
-                    minWidth: screenSize.width,
-                    height: 50,
-                  )
-                ],
-              ),
-            ),
           ],
         ),
+      ),
+      bottomSheet: FlatButton(
+        child: Text(
+          "Delete task",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 19
+          ),
+        ),
+        color: Colors.blueGrey,
+        onPressed: ()
+        {
+          _deleteTask();
+        },
+        minWidth: screenSize.width,
+        height: 50,
       ),
     );
   }

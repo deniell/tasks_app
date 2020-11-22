@@ -18,6 +18,8 @@ class TaskWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final Size screenSize = MediaQuery.of(context).size;
+
     String formatted = '';
     try {
       final DateTime date = DateTime.fromMicrosecondsSinceEpoch((task.dueBy*1000000));
@@ -40,7 +42,7 @@ class TaskWidget extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 280,
+                    width: screenSize.width*(3/4),
                     padding: const EdgeInsets.all(10),
                     child: Text(
                       task.title,

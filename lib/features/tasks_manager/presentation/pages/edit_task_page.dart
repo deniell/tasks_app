@@ -54,7 +54,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
     _title = widget.task.title;
     _description = widget.task.description;
     _priority = widget.task.priority;
-    _dueBy = widget.task.dueBy*1000000;
+    if (widget.task.dueBy != null) {
+      _dueBy = widget.task.dueBy*1000000;
+    }
     _updatedTask = widget.task;
     super.initState();
   }
@@ -71,11 +73,10 @@ class _EditTaskPageState extends State<EditTaskPage> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return loading ? LoadingWidget() :  Scaffold(
-      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
         title: Text(
-          'Add Task',
+          'Edit Task',
           style: TextStyle(
             color: Colors.black,
           ),
@@ -97,8 +98,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
           },
         ),
       ),
-      body: Container(
-        child: Column(
+      body: SingleChildScrollView(
+        child: ListBody(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -108,8 +109,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   child: Text(
                     "Title",
                     style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 16
+                      color: Colors.grey[600],
+                      fontSize: 16
                     ),
                   ),
                 ),
@@ -120,21 +121,21 @@ class _EditTaskPageState extends State<EditTaskPage> {
               child: Form(
                 key: _formKey,
                 child: TextFormField(
-                    focusNode: _titleFocus,
-                    decoration: textInputDecoration.copyWith(hintText: ''),
-                    keyboardType: TextInputType.text,
-                    validator: (val) => val.isEmpty ? 'Enter a title' : null,
-                    maxLines: 5,
-                    minLines: 3,
-                    maxLength: 255,
-                    onChanged: (val) {
-                      _title = val;
-                    },
-                    initialValue: _title != null ? _title : "",
-                    textInputAction: TextInputAction.next,
-                    onFieldSubmitted: (term) {
-                      _fieldFocusChange(context, _titleFocus, _descriptionFocus);
-                    }
+                  focusNode: _titleFocus,
+                  decoration: textInputDecoration.copyWith(hintText: ''),
+                  keyboardType: TextInputType.text,
+                  validator: (val) => val.isEmpty ? 'Enter a title' : null,
+                  maxLines: 5,
+                  minLines: 3,
+                  maxLength: 255,
+                  onChanged: (val) {
+                    _title = val;
+                  },
+                  initialValue: _title != null ? _title : "",
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (term) {
+                    _fieldFocusChange(context, _titleFocus, _descriptionFocus);
+                  }
                 ),
               ),
             ),
@@ -154,8 +155,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   child: Text(
                     "Priority",
                     style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 16
+                      color: Colors.grey[600],
+                      fontSize: 16
                     ),
                   ),
                 ),
@@ -168,6 +169,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                 elevation: 0,
                 enableButtonWrap: true,
                 unSelectedColor: Theme.of(context).canvasColor,
+                padding: 5,
                 buttonLables: [
                   'High',
                   'Medium',
@@ -206,8 +208,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   child: Text(
                     "Description",
                     style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 16
+                      color: Colors.grey[600],
+                      fontSize: 16
                     ),
                   ),
                 ),
@@ -216,19 +218,19 @@ class _EditTaskPageState extends State<EditTaskPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: TextFormField(
-                  focusNode: _descriptionFocus,
-                  decoration: textInputDecoration.copyWith(hintText: ''),
-                  keyboardType: TextInputType.text,
-                  maxLines: 5,
-                  minLines: 3,
-                  onChanged: (val) {
-                    _description = val;
-                  },
-                  initialValue: _description != null ? _description : "",
-                  textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (term) {
-                    _descriptionFocus.unfocus();
-                  }
+                focusNode: _descriptionFocus,
+                decoration: textInputDecoration.copyWith(hintText: ''),
+                keyboardType: TextInputType.text,
+                maxLines: 5,
+                minLines: 3,
+                onChanged: (val) {
+                  _description = val;
+                },
+                initialValue: _description != null ? _description : "",
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (term) {
+                  _descriptionFocus.unfocus();
+                }
               ),
             ),
             Padding(
@@ -242,49 +244,44 @@ class _EditTaskPageState extends State<EditTaskPage> {
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: DateTimePicker(
-                  initialValue: _dueBy != null ? DateTime.fromMicrosecondsSinceEpoch(_dueBy).toString() : '',
-                  type: DateTimePickerType.dateTimeSeparate,
-                  dateMask: 'd MMM, yyyy',
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2200),
+                initialValue: _dueBy != null ? DateTime.fromMicrosecondsSinceEpoch(_dueBy).toString() : '',
+                type: DateTimePickerType.dateTimeSeparate,
+                dateMask: 'd MMM, yyyy',
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2200),
 
-                  icon: Icon(Icons.event),
-                  dateLabelText: 'Date',
-                  timeLabelText: "Time",
-                  onChanged: (val)
-                  {
-                    log.d("New event time is: $val");
-                    _dueBy = DateTime.parse(val).microsecondsSinceEpoch;
-                    log.d("New event time in milliseconds since epoch: $_dueBy");
-                  }
+                icon: Icon(Icons.event),
+                dateLabelText: 'Date',
+                timeLabelText: "Time",
+                onChanged: (val)
+                {
+                  log.d("New event time is: $val");
+                  _dueBy = DateTime.parse(val).microsecondsSinceEpoch;
+                  log.d("New event time in milliseconds since epoch: $_dueBy");
+                }
               ),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  FlatButton(
-                    child: Text(
-                      "Update task",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19
-                      ),
-                    ),
-                    color: Colors.blueAccent,
-                    onPressed: ()
-                    {
-                      _updateTask();
-                    },
-                    minWidth: screenSize.width,
-                    height: 50,
-                  )
-                ],
-              ),
-            ),
+            SizedBox(
+              height: 60,
+            )
           ],
         ),
+      ),
+      bottomSheet: FlatButton(
+        child: Text(
+          "Update task",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 19
+          ),
+        ),
+        color: Colors.blueAccent,
+        onPressed: ()
+        {
+          _updateTask();
+        },
+        minWidth: screenSize.width,
+        height: 50,
       ),
     );
   }

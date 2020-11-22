@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart' as pr;
+import 'package:provider/provider.dart';
 import 'package:tasks_app/features/authorization/domain/services/auth_service.dart';
 import 'package:tasks_app/features/authorization/presentation/widgets/wrapper.dart';
-import 'injection_container.dart' as di;
+import 'package:tasks_app/injection_container.dart' as di;
 
 void main() async {
   // ensure that core.widgets initialization finished
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return pr.ChangeNotifierProvider<AuthService>(
+    return ChangeNotifierProvider<AuthService>(
       create: (context) => di<AuthService>(),
       child: MaterialApp(
         home: Wrapper(),

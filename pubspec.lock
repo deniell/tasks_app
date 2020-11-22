@@ -342,7 +342,7 @@ packages:
       name: hive
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.1+1"
+    version: "1.4.4+1"
   hive_flutter:
     dependency: "direct main"
     description:
@@ -370,7 +370,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.0+4"
+    version: "0.12.2"
   http_multi_server:
     dependency: transitive
     description:

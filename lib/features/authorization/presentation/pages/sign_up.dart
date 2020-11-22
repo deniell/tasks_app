@@ -39,6 +39,7 @@ class _SignUpState extends State<SignUp> {
     final authServiceProvider = pr.Provider.of<AuthService>(context);
 
     return loading ? LoadingWidget() : Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.grey[300],
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),

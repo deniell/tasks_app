@@ -61,207 +61,201 @@ class _AddTaskPageState extends State<AddTaskPage> {
     final Size screenSize = MediaQuery.of(context).size;
 
   return loading ? LoadingWidget() :  Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Colors.grey[300],
-        title: Text(
-          'Add Task',
-          style: TextStyle(
-            color: Colors.black,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0.0,
-        leading: BackButton(
-          color: Colors.grey[700],
+    appBar: AppBar(
+      backgroundColor: Colors.grey[300],
+      title: Text(
+        'Add Task',
+        style: TextStyle(
+          color: Colors.black,
         ),
       ),
-      body: Container(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                  child: Text(
-                    "Title",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16
-                    ),
+      centerTitle: true,
+      elevation: 0.0,
+      leading: BackButton(
+        color: Colors.grey[700],
+      ),
+    ),
+    body: SingleChildScrollView(
+      child: ListBody(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
+                child: Text(
+                  "Title",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16
                   ),
                 ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Form(
-                key: _formKey,
-                child: TextFormField(
-                  focusNode: _titleFocus,
-                  decoration: textInputDecoration.copyWith(hintText: ''),
-                  keyboardType: TextInputType.text,
-                  validator: (val) => val.isEmpty ? 'Enter a title' : null,
-                  maxLines: 5,
-                  minLines: 3,
-                  maxLength: 255,
-                  onChanged: (val) {
-                    _title = val;
-                  },
-                  initialValue: _title != null ? _title : "",
-                  textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (term) {
-                    _fieldFocusChange(context, _titleFocus, _descriptionFocus);
-                  }
-                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 10),
-              child: Divider(
-                color: Colors.grey[600],
-                thickness: 0.5,
-                height: 0,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-                  child: Text(
-                    "Priority",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: CustomRadioButton(
-                elevation: 0,
-                enableButtonWrap: true,
-                unSelectedColor: Theme.of(context).canvasColor,
-                buttonLables: [
-                  'High',
-                  'Medium',
-                  'Low',
-                ],
-                buttonValues: [
-                  Priority.High,
-                  Priority.Normal,
-                  Priority.Low,
-                ],
-                buttonTextStyle: const ButtonTextStyle(
-                  selectedColor: Colors.white,
-                  unSelectedColor: Colors.black,
-                  textStyle: TextStyle(fontSize: 16)
-                ),
-                radioButtonValue: (value) {
-                  log.d("new priority is: $value");
-                  _priority = value;
-                },
-                selectedColor: Theme.of(context).accentColor,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 10),
-              child: Divider(
-                color: Colors.grey[600],
-                thickness: 0.5,
-                height: 0,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
-                  child: Text(
-                    "Description",
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Form(
+              key: _formKey,
               child: TextFormField(
-                focusNode: _descriptionFocus,
+                focusNode: _titleFocus,
                 decoration: textInputDecoration.copyWith(hintText: ''),
                 keyboardType: TextInputType.text,
+                validator: (val) => val.isEmpty ? 'Enter a title' : null,
                 maxLines: 5,
                 minLines: 3,
+                maxLength: 255,
                 onChanged: (val) {
-                  _description = val;
+                  _title = val;
                 },
-                initialValue: _description != null ? _description : "",
-                textInputAction: TextInputAction.done,
+                initialValue: _title != null ? _title : "",
+                textInputAction: TextInputAction.next,
                 onFieldSubmitted: (term) {
-                  _descriptionFocus.unfocus();
+                  _fieldFocusChange(context, _titleFocus, _descriptionFocus);
                 }
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15, bottom: 10),
-              child: Divider(
-                color: Colors.grey[600],
-                thickness: 0.5,
-                height: 0,
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 10),
+            child: Divider(
+              color: Colors.grey[600],
+              thickness: 0.5,
+              height: 0,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
-              child: DateTimePicker(
-                initialValue: _dueBy != null ? DateTime.fromMicrosecondsSinceEpoch(_dueBy, isUtc: true).toString() : '',
-                type: DateTimePickerType.dateTimeSeparate,
-                dateMask: 'd MMM, yyyy',
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2200),
-                icon: Icon(Icons.event),
-                dateLabelText: 'Date',
-                timeLabelText: "Time",
-                onChanged: (val)
-                {
-                  log.d("New event time is: $val");
-                  _dueBy = DateTime.parse(val).microsecondsSinceEpoch;
-                  log.d("New event time in milliseconds since epoch: $_dueBy");
-                }
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+                child: Text(
+                  "Priority",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16
+                  ),
+                ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  FlatButton(
-                    child: Text(
-                      "Create task",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 19
-                      ),
-                    ),
-                    color: Colors.blueAccent,
-                    onPressed: ()
-                    {
-                      _addTask();
-                    },
-                    minWidth: screenSize.width,
-                    height: 50,
-                  )
-                ],
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: CustomRadioButton(
+              elevation: 0,
+              enableButtonWrap: true,
+              unSelectedColor: Theme.of(context).canvasColor,
+              buttonLables: [
+                'High',
+                'Medium',
+                'Low',
+              ],
+              buttonValues: [
+                Priority.High,
+                Priority.Normal,
+                Priority.Low,
+              ],
+              buttonTextStyle: const ButtonTextStyle(
+                selectedColor: Colors.white,
+                unSelectedColor: Colors.black,
+                textStyle: TextStyle(fontSize: 16)
               ),
+              radioButtonValue: (value) {
+                log.d("new priority is: $value");
+                _priority = value;
+              },
+              selectedColor: Theme.of(context).accentColor,
             ),
-          ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 10),
+            child: Divider(
+              color: Colors.grey[600],
+              thickness: 0.5,
+              height: 0,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15, top: 5, bottom: 15),
+                child: Text(
+                  "Description",
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: TextFormField(
+              focusNode: _descriptionFocus,
+              decoration: textInputDecoration.copyWith(hintText: ''),
+              keyboardType: TextInputType.text,
+              maxLines: 5,
+              minLines: 3,
+              onChanged: (val) {
+                _description = val;
+              },
+              initialValue: _description != null ? _description : "",
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (term) {
+                _descriptionFocus.unfocus();
+              }
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, bottom: 10),
+            child: Divider(
+              color: Colors.grey[600],
+              thickness: 0.5,
+              height: 0,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: DateTimePicker(
+              initialValue: _dueBy != null ? DateTime.fromMicrosecondsSinceEpoch(_dueBy, isUtc: true).toString() : '',
+              type: DateTimePickerType.dateTimeSeparate,
+              dateMask: 'd MMM, yyyy',
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2200),
+              icon: Icon(Icons.event),
+              dateLabelText: 'Date',
+              timeLabelText: "Time",
+              onChanged: (val)
+              {
+                log.d("New event time is: $val");
+                _dueBy = DateTime.parse(val).microsecondsSinceEpoch;
+                log.d("New event time in milliseconds since epoch: $_dueBy");
+              }
+            ),
+          ),
+          SizedBox(
+            height: 60,
+          )
+        ],
+      ),
+    ),
+    bottomSheet: FlatButton(
+        child: Text(
+          "Create task",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 19
+          ),
         ),
+        color: Colors.blueAccent,
+        onPressed: ()
+        {
+          _addTask();
+        },
+        minWidth: screenSize.width,
+        height: 50,
       ),
     );
   }
