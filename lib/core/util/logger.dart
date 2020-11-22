@@ -24,10 +24,20 @@ class Logger
         colors: false, // Colorful log messages
         printEmojis: true, // Print an emoji for each log message
         printTime: false // Should each log print contain a timestamp
-      )
+      ),
+      // filter: DebugFilter()
     );
 
     // Set logging level
     package.Logger.level = package.Level.debug; // for detailed debugging
+  }
+}
+
+class DebugFilter extends package.LogFilter
+{
+  @override
+  bool shouldLog(package.LogEvent event)
+  {
+    return true;
   }
 }

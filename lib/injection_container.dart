@@ -13,28 +13,32 @@ import 'package:tasks_app/features/tasks_manager/data/datasources/remote_datasou
 import 'package:tasks_app/features/tasks_manager/data/repositories/local_repository.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:tasks_app/features/tasks_manager/data/repositories/task_repository.dart';
-import 'package:tasks_app/features/tasks_manager/presentation/bloc/bloc.dart';
+
+import 'features/tasks_manager/presentation/bloc/tasks_list_bloc.dart';
 
 final di = GetIt.instance;
 
 Future<void> init() async {
+
   // initialize Hive
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
   Hive.registerAdapter(UserAdapter());
   final userBox = await Hive.openBox('user_entity');
 
-  // External
-  di.registerLazySingleton(() => http.Client());
-  di.registerLazySingleton(() => DataConnectionChecker());
-  di.registerLazySingleton(() => Connectivity());
-
-  // Core
-  di.registerLazySingleton<NetworkInfo>(
-    () => NetworkInfoImpl(
-      connectionChecker: di(),
-      connectivity: di()
+  // Services
+  di.registerFactory(
+    () => AuthService(
+      authRepository: di(),
+      localeRepository: di(),
     )
+  );
+
+  // Bloc
+  di.registerFactory(
+    () => TasksListBloc(
+      taskRepository: di()
+    ),
   );
 
   // Data sources
@@ -68,19 +72,17 @@ Future<void> init() async {
     )
   );
 
-  // Services
-  di.registerFactory(
-    () => AuthService(
-      authRepository: di(),
-      localeRepository: di(),
-    )
-  );
+  // External
+  di.registerLazySingleton(() => http.Client());
+  di.registerLazySingleton(() => DataConnectionChecker());
+  di.registerLazySingleton(() => Connectivity());
 
-  // Bloc
-  di.registerFactory(
-    () => TasksListBloc(
-    taskRepository: di()
-    ),
+  // Core
+  di.registerLazySingleton<NetworkInfo>(
+    () => NetworkInfoImpl(
+      connectionChecker: di(),
+      connectivity: di()
+    )
   );
 }
 
